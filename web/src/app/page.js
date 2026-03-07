@@ -111,7 +111,7 @@ export default function SplashPage() {
     if (token) router.replace("/dashboard");
   }, [router]);
 
-  const handleGetStarted = () => router.push("/register");
+  const handleGetStarted = () => router.push("/role-selection");
   const handleSignIn     = () => router.push("/login");
 
   return (
