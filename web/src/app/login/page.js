@@ -37,95 +37,173 @@ export default function LoginPage() {
     }
   };
 
+  const styles = {
+    container: {
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "32px 16px",
+      backgroundColor: "#FFF8F0",
+    },
+    card: {
+      width: "100%",
+      maxWidth: "640px",
+      backgroundColor: "#FFF8F0",
+      borderRadius: "16px",
+      padding: "32px",
+      boxShadow: "0px 2px 6px rgba(0,0,0,0.05)",
+      border: "1px solid #D3D3D3",
+    },
+    header: {
+      textAlign: "center",
+      marginBottom: "32px",
+    },
+    title: {
+      fontSize: "20px",
+      fontWeight: 600,
+      color: "#333333",
+      marginBottom: "8px",
+    },
+    subtitle: {
+      fontSize: "14px",
+      fontWeight: 400,
+      color: "#D3D3D3",
+    },
+    errorBox: {
+      padding: "12px",
+      borderRadius: "10px",
+      backgroundColor: "#FFCCBC",
+      border: "2px solid #FFCCBC",
+      color: "#333333",
+      fontSize: "14px",
+      marginBottom: "24px",
+    },
+    label: {
+      display: "block",
+      fontSize: "14px",
+      fontWeight: 600,
+      color: "#333333",
+      marginBottom: "8px",
+    },
+    input: {
+      width: "100%",
+      height: "48px",
+      padding: "0 16px",
+      fontSize: "14px",
+      color: "#333333",
+      backgroundColor: "#FFF8F0",
+      border: "2px solid #D3D3D3",
+      borderRadius: "10px",
+      outline: "none",
+      transition: "border-color 0.2s ease",
+    },
+    button: {
+      width: "100%",
+      height: "48px",
+      backgroundColor: "#B6E5D8",
+      border: "none",
+      borderRadius: "12px",
+      fontSize: "14px",
+      fontWeight: 600,
+      color: "#333333",
+      cursor: "pointer",
+      transition: "opacity 0.15s ease",
+      boxShadow: "0px 2px 6px rgba(0,0,0,0.08)",
+    },
+    buttonDisabled: {
+      width: "100%",
+      height: "48px",
+      backgroundColor: "#D3D3D3",
+      border: "none",
+      borderRadius: "12px",
+      fontSize: "14px",
+      fontWeight: 600,
+      color: "#999999",
+      cursor: "not-allowed",
+      boxShadow: "0px 2px 6px rgba(0,0,0,0.05)",
+    },
+    footer: {
+      textAlign: "center",
+      marginTop: "24px",
+      fontSize: "13px",
+      color: "#D3D3D3",
+    },
+    link: {
+      fontWeight: 600,
+      color: "#333333",
+      textDecoration: "underline",
+      cursor: "pointer",
+      background: "none",
+      border: "none",
+      fontSize: "13px",
+      padding: 0,
+    },
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-2xl" style={{ padding: '2rem 2rem' }}>
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1A237E' }}>
-              Welcome Back
-            </h1>
-            <p className="text-sm md:text-base" style={{ color: '#78909C' }}>
-              Please login to your account
-            </p>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <div style={styles.header}>
+          <h1 style={styles.title}>Welcome Back</h1>
+          <p style={styles.subtitle}>Please login to your account</p>
+        </div>
+
+        {error && (
+          <div style={styles.errorBox}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div>
+            <label style={styles.label}>Email Address</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={styles.input}
+              onFocus={(e) => e.target.style.borderColor = "#B6E5D8"}
+              onBlur={(e) => e.target.style.borderColor = "#D3D3D3"}
+              placeholder="you@example.com"
+              required
+            />
           </div>
 
-          {error && (
-            <div className="mb-6 p-3 rounded-lg" style={{ background: '#FFEBEE', border: '1px solid #FFCDD2', color: '#C62828' }}>
-              <p className="text-sm">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#455A64', marginTop: '1rem' }}>
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 text-base rounded-lg border-2 focus:outline-none transition-all"
-                style={{ 
-                  borderColor: '#E0E0E0',
-                  background: '#FAFAFA'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#5E35B1'}
-                onBlur={(e) => e.target.style.borderColor = '#E0E0E0'}
-                placeholder="you@example.com"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#455A64', marginTop: '1rem' }}>
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 text-base rounded-lg border-2 focus:outline-none transition-all"
-                style={{ 
-                  borderColor: '#E0E0E0',
-                  background: '#FAFAFA',
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#5E35B1'}
-                onBlur={(e) => e.target.style.borderColor = '#E0E0E0'}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full text-white rounded-lg py-3.5 text-base font-semibold hover:shadow-lg disabled:opacity-50 transition-all"
-              style={{ 
-                background: loading ? '#9575CD' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                transform: loading ? 'scale(1)' : 'scale(1)',
-                marginTop: '1rem'
-              }}
-              onMouseEnter={(e) => !loading && (e.target.style.transform = 'translateY(-2px)')}
-              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-            >
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </form>
-
-          <div className="text-center" style={{ marginTop: '1rem' }}>
-            <span className="text-sm" style={{ color: '#78909C' }}>
-              Dont have an account?{" "}
-            </span>
-            <button
-              type="button"
-              onClick={() => router.push("/register")}
-              className="text-sm font-semibold hover:underline"
-              style={{ color: '#5E35B1' }}
-            >
-              Create one
-            </button>
+          <div>
+            <label style={styles.label}>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={styles.input}
+              onFocus={(e) => e.target.style.borderColor = "#B6E5D8"}
+              onBlur={(e) => e.target.style.borderColor = "#D3D3D3"}
+              placeholder="••••••••"
+              required
+            />
           </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={loading ? styles.buttonDisabled : styles.button}
+            onMouseEnter={(e) => !loading && (e.target.style.opacity = "0.9")}
+            onMouseLeave={(e) => !loading && (e.target.style.opacity = "1")}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+
+        <div style={styles.footer}>
+          Don't have an account?{" "}
+          <button
+            type="button"
+            onClick={() => router.push("/role-selection")}
+            style={styles.link}
+          >
+            Create one
+          </button>
         </div>
       </div>
     </div>

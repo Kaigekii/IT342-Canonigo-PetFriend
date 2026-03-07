@@ -3,26 +3,31 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
-    <!-- Primary Colors -->
+    <!-- Design System Colors -->
+    <color name="background_cream">#FFF8F0</color>
+    <color name="soft_peach">#FFD8B9</color>
+    <color name="blush_pink">#FFB6C1</color>
+    <color name="mint_green">#B6E5D8</color>
+    <color name="error_red">#FFCCBC</color>
+    
+    <!-- Neutrals -->
+    <color name="gray_dark">#333333</color>
+    <color name="gray_border">#D3D3D3</color>
+    <color name="gray_light">#999999</color>
+    <color name="gray_text">#666666</color>
+    
+    <!-- Legacy Colors (keep for compatibility) -->
     <color name="primary">#5E35B1</color>
     <color name="primary_dark">#1A237E</color>
     <color name="primary_light">#9575CD</color>
-    
-    <!-- Accent Colors -->
     <color name="accent">#FF5722</color>
     <color name="accent_light">#FF8A65</color>
-    
-    <!-- Background Colors -->
     <color name="background">#F5F7FA</color>
     <color name="surface">#FFFFFF</color>
     <color name="surface_variant">#F5F7FA</color>
-    
-    <!-- Text Colors -->
     <color name="text_primary">#263238</color>
     <color name="text_secondary">#607D8B</color>
     <color name="text_hint">#90A4AE</color>
-    
-    <!-- Status Colors -->
     <color name="error">#D32F2F</color>
     <color name="success">#388E3C</color>
     <color name="warning">#F57C00</color>
