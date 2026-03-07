@@ -217,6 +217,7 @@ export default function SitterRegisterPage() {
     <div style={styles.container}>
       <div style={styles.card}>
         <div style={styles.header}>
+          <img src="/petfriend-logo-icon.svg" alt="PetFriend Logo" style={{ width: 70, height: 70, margin: "0 auto 16px" }} />
           <h1 style={styles.title}>Create Pet Sitter Account</h1>
           <p style={styles.subtitle}>Join as a pet sitter</p>
           <span style={styles.badge}>PET SITTER</span>

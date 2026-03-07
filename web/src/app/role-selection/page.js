@@ -188,7 +188,7 @@ export default function RoleSelectionPage() {
     <div style={styles.wrapper} className="splash-fade-in">
       {/* Logo */}
       <div style={styles.logoCircle}>
-        <PawIcon size={48} color="#333333" />
+        <img src="/petfriend-logo-icon.svg" alt="PetFriend Logo" style={{ width: 48, height: 48 }} />
       </div>
 
       {/* Heading */}

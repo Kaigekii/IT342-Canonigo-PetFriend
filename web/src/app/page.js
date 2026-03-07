@@ -118,7 +118,7 @@ export default function SplashPage() {
     <div style={styles.wrapper} className="splash-fade-in">
       {/* Logo circle */}
       <div style={styles.logoCircle} className="splash-pulse">
-        <PawIcon size={56} color="#333333" />
+        <img src="/petfriend-logo-icon.svg" alt="PetFriend Logo" style={{ width: 56, height: 56 }} />
       </div>
 
       {/* App name */}
