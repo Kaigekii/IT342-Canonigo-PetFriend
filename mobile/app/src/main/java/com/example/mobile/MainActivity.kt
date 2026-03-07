@@ -10,14 +10,15 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         
         val prefsManager = PreferencesManager(this)
+        val token = prefsManager.getToken()
         
         // Check if user is already logged in
-        if (prefsManager.isLoggedIn()) {
+        if (token != null) {
             // User is logged in, go to Dashboard
             startActivity(Intent(this, DashboardActivity::class.java))
         } else {
-            // User is not logged in, go to Login screen
-            startActivity(Intent(this, LoginActivity::class.java))
+            // User is not logged in, go to Splash screen
+            startActivity(Intent(this, SplashActivity::class.java))
         }
         
         finish()

@@ -9,14 +9,42 @@ export default function SitterRegisterPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const validatePassword = (pwd) => {
+    const minLength = pwd.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(pwd);
+    const hasNumber = /[0-9]/.test(pwd);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+    
+    return { minLength, hasUpperCase, hasNumber, hasSpecialChar, isValid: minLength && hasUpperCase && hasNumber && hasSpecialChar };
+  };
+
+  // Real-time validation state
+  const passwordValidation = validatePassword(password);
+  const passwordsMatch = password && confirmPassword && password === confirmPassword;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    // Validate password
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setError("Password must be at least 8 characters with 1 uppercase letter, 1 number, and 1 special character");
+      return;
+    }
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -161,6 +189,28 @@ export default function SitterRegisterPage() {
       fontSize: "13px",
       padding: 0,
     },
+    passwordHint: {
+      fontSize: "12px",
+      color: "#999999",
+      marginTop: "6px",
+      lineHeight: "1.4",
+    },
+    validationList: {
+      fontSize: "12px",
+      marginTop: "8px",
+      listStyle: "none",
+      padding: 0,
+    },
+    validationItem: {
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      marginBottom: "4px",
+    },
+    validationIcon: {
+      fontSize: "14px",
+      fontWeight: "bold",
+    },
   };
 
   return (
@@ -231,10 +281,71 @@ export default function SitterRegisterPage() {
               style={styles.input}
               onFocus={(e) => e.target.style.borderColor = "#FFB6C1"}
               onBlur={(e) => e.target.style.borderColor = "#D3D3D3"}
-              placeholder="At least 6 characters"
-              minLength={6}
+              placeholder="Create a strong password"
               required
             />
+            {password && (
+              <ul style={styles.validationList}>
+                <li style={styles.validationItem}>
+                  <span style={{ ...styles.validationIcon, color: passwordValidation.minLength ? "#B6E5D8" : "#FFCCBC" }}>
+                    {passwordValidation.minLength ? "✓" : "✗"}
+                  </span>
+                  <span style={{ color: passwordValidation.minLength ? "#333333" : "#999999" }}>
+                    At least 8 characters
+                  </span>
+                </li>
+                <li style={styles.validationItem}>
+                  <span style={{ ...styles.validationIcon, color: passwordValidation.hasUpperCase ? "#B6E5D8" : "#FFCCBC" }}>
+                    {passwordValidation.hasUpperCase ? "✓" : "✗"}
+                  </span>
+                  <span style={{ color: passwordValidation.hasUpperCase ? "#333333" : "#999999" }}>
+                    At least 1 uppercase letter
+                  </span>
+                </li>
+                <li style={styles.validationItem}>
+                  <span style={{ ...styles.validationIcon, color: passwordValidation.hasNumber ? "#B6E5D8" : "#FFCCBC" }}>
+                    {passwordValidation.hasNumber ? "✓" : "✗"}
+                  </span>
+                  <span style={{ color: passwordValidation.hasNumber ? "#333333" : "#999999" }}>
+                    At least 1 number
+                  </span>
+                </li>
+                <li style={styles.validationItem}>
+                  <span style={{ ...styles.validationIcon, color: passwordValidation.hasSpecialChar ? "#B6E5D8" : "#FFCCBC" }}>
+                    {passwordValidation.hasSpecialChar ? "✓" : "✗"}
+                  </span>
+                  <span style={{ color: passwordValidation.hasSpecialChar ? "#333333" : "#999999" }}>
+                    At least 1 special character
+                  </span>
+                </li>
+              </ul>
+            )}
+          </div>
+
+          <div>
+            <label style={styles.label}>Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              style={styles.input}
+              onFocus={(e) => e.target.style.borderColor = "#FFB6C1"}
+              onBlur={(e) => e.target.style.borderColor = "#D3D3D3"}
+              placeholder="Re-enter your password"
+              required
+            />
+            {confirmPassword && (
+              <ul style={styles.validationList}>
+                <li style={styles.validationItem}>
+                  <span style={{ ...styles.validationIcon, color: passwordsMatch ? "#B6E5D8" : "#FFCCBC" }}>
+                    {passwordsMatch ? "✓" : "✗"}
+                  </span>
+                  <span style={{ color: passwordsMatch ? "#333333" : "#999999" }}>
+                    Passwords match
+                  </span>
+                </li>
+              </ul>
+            )}
           </div>
 
           <div>

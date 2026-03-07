@@ -4,24 +4,20 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.example.mobile.model.LoginRequest
-import com.example.mobile.network.RetrofitClient
+import com.example.mobile.network.ApiClient
+import com.example.mobile.network.LoginRequest
 import com.example.mobile.util.PreferencesManager
-import com.google.android.material.textfield.TextInputEditText
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LoginActivity : Activity() {
     
-    private val job = Job()
-    private val scope = CoroutineScope(Dispatchers.Main + job)
-    
-    private lateinit var etEmail: TextInputEditText
-    private lateinit var etPassword: TextInputEditText
+    private lateinit var etEmail: EditText
+    private lateinit var etPassword: EditText
     private lateinit var btnLogin: Button
     private lateinit var tvGoToRegister: TextView
     
@@ -34,7 +30,8 @@ class LoginActivity : Activity() {
         prefsManager = PreferencesManager(this)
         
         // Check if user is already logged in
-        if (prefsManager.isLoggedIn()) {
+        val token = prefsManager.getToken()
+        if (token != null) {
             navigateToDashboard()
             return
         }
@@ -61,13 +58,7 @@ class LoginActivity : Activity() {
     }
     
     private fun navigateToRegister() {
-        startActivity(Intent(this, RegisterActivity::class.java))
-        finish()
-    }
-    
-    override fun onBackPressed() {
-        // On login screen, back button exits the app
-        finishAffinity()
+        startActivity(Intent(this, RoleSelectionActivity::class.java))
     }
     
     private fun performLogin() {
@@ -90,46 +81,28 @@ class LoginActivity : Activity() {
         // Disable button during login
         btnLogin.isEnabled = false
         
-        scope.launch {
-            try {
-                val response = RetrofitClient.apiService.login(request)
-                
+        ApiClient.apiService.login(request).enqueue(object : Callback<com.example.mobile.network.AuthResponse> {
+            override fun onResponse(call: Call<com.example.mobile.network.AuthResponse>, response: Response<com.example.mobile.network.AuthResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     val authResponse = response.body()!!
-                    
-                    // Save token and user data
-                    prefsManager.saveAuthToken(authResponse.token)
-                    prefsManager.saveUserData(
-                        authResponse.id,
-                        authResponse.firstName,
-                        authResponse.lastName,
-                        authResponse.email,
-                        authResponse.age,
-                        authResponse.gender,
-                        authResponse.address
-                    )
-                    
+                    prefsManager.saveToken(authResponse.token)
                     Toast.makeText(this@LoginActivity, "Login successful!", Toast.LENGTH_SHORT).show()
                     navigateToDashboard()
                 } else {
-                    val errorBody = response.errorBody()?.string() ?: "Login failed"
-                    Toast.makeText(this@LoginActivity, errorBody, Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@LoginActivity, "Login failed: ${response.message()}", Toast.LENGTH_SHORT).show()
                     btnLogin.isEnabled = true
                 }
-            } catch (e: Exception) {
-                Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+
+            override fun onFailure(call: Call<com.example.mobile.network.AuthResponse>, t: Throwable) {
+                Toast.makeText(this@LoginActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                 btnLogin.isEnabled = true
             }
-        }
+        })
     }
     
     private fun navigateToDashboard() {
         startActivity(Intent(this, DashboardActivity::class.java))
         finish()
-    }
-    
-    override fun onDestroy() {
-        super.onDestroy()
-        job.cancel()
     }
 }

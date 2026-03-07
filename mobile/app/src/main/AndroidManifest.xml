@@ -28,6 +28,22 @@
         </activity>
         
         <activity
+            android:name=".SplashActivity"
+            android:exported="false" />
+        
+        <activity
+            android:name=".RoleSelectionActivity"
+            android:exported="false" />
+        
+        <activity
+            android:name=".OwnerRegisterActivity"
+            android:exported="false" />
+        
+        <activity
+            android:name=".SitterRegisterActivity"
+            android:exported="false" />
+        
+        <activity
             android:name=".LoginActivity"
             android:exported="false" />
         

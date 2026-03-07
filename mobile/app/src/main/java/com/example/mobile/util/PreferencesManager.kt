@@ -24,8 +24,16 @@ class PreferencesManager(context: Context) {
         prefs.edit().putString(KEY_TOKEN, token).apply()
     }
     
+    fun saveToken(token: String) {
+        saveAuthToken(token)
+    }
+    
     fun getAuthToken(): String? {
         return prefs.getString(KEY_TOKEN, null)
+    }
+    
+    fun getToken(): String? {
+        return getAuthToken()
     }
     
     fun saveUserData(
