@@ -1,33 +1,50 @@
 @import "tailwindcss";
+/* Inter is loaded via next/font/google in layout.js */
 
 :root {
-  --background: #F5F7FA;
-  --foreground: #263238;
-  --primary: #5E35B1;
-  --primary-dark: #1A237E;
-  --primary-light: #9575CD;
-  --accent: #FF5722;
-  --surface: #FFFFFF;
-  --text-secondary: #607D8B;
-  --error: #D32F2F;
-  --success: #388E3C;
+  /* Design System — PetFriend */
+  --color-primary:        #FFD8B9; /* Soft Peach */
+  --color-secondary:      #FFB6C1; /* Blush Pink */
+  --color-success:        #B6E5D8; /* Mint Green */
+  --color-warning:        #FFF9C4; /* Butter Yellow */
+  --color-error:          #FFCCBC; /* Coral Pink */
+  --color-neutral-light:  #FFF8F0; /* Cream White */
+  --color-neutral-medium: #D3D3D3; /* Light Gray */
+  --color-neutral-dark:   #333333; /* Charcoal Gray */
+
+  --background: var(--color-neutral-light);
+  --foreground: var(--color-neutral-dark);
+  --surface: var(--color-neutral-light);
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-size-h1: 20px;
+  --font-size-h2: 16px;
+  --font-size-body: 14px;
+  --font-size-caption: 12px;
+  --font-weight-semibold: 600;
+  --font-weight-regular: 400;
+  --line-height: 1.5;
+
+  /* Spacing */
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-edge: 16px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-surface: var(--surface);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-family);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -49,10 +66,47 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #9575CD;
+  background: var(--color-primary);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #5E35B1;
+  background: var(--color-secondary);
+}
+
+/* ── Splash Screen Animations ───────────────────────────────── */
+@keyframes splashFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splashPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.06); }
+}
+
+@keyframes progressBar {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+@keyframes splashFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.splash-fade-in {
+  animation: splashFadeIn 0.7s ease forwards;
+}
+
+.splash-pulse {
+  animation: splashPulse 2s ease-in-out infinite;
+}
+
+.splash-progress {
+  animation: progressBar 2.2s ease-in-out forwards;
+}
+
+.splash-fade-out {
+  animation: splashFadeOut 0.4s ease forwards;
 }
