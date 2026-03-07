@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B6B"/>
+      <stop offset="100%" style="stop-color:#FF8E53"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#FF6B6B" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Circle background -->
+  <circle cx="100" cy="100" r="95" fill="url(#bgGrad)" filter="url(#shadow)"/>
+
+  <!-- Subtle inner glow ring -->
+  <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+
+  <!-- Paw print -->
+  <!-- Top left toe -->
+  <ellipse cx="68" cy="66" rx="11" ry="10" fill="white" opacity="0.95"/>
+  <!-- Top middle toe -->
+  <ellipse cx="100" cy="58" rx="11" ry="10" fill="white" opacity="0.95"/>
+  <!-- Top right toe -->
+  <ellipse cx="132" cy="66" rx="11" ry="10" fill="white" opacity="0.95"/>
+
+  <!-- Main pad -->
+  <ellipse cx="100" cy="112" rx="28" ry="25" fill="white" opacity="0.95"/>
+
+  <!-- Heart on main pad -->
+  <path d="M100 124 C100 124 85 113 85 105 C85 99.5 89 96 93.5 96 C96.5 96 99 98 100 100 C101 98 103.5 96 106.5 96 C111 96 115 99.5 115 105 C115 113 100 124 100 124 Z" fill="#FF6B6B" opacity="0.55"/>
+</svg>

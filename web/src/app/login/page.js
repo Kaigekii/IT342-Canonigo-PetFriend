@@ -145,6 +145,7 @@ export default function LoginPage() {
     <div style={styles.container}>
       <div style={styles.card}>
         <div style={styles.header}>
+          <img src="/petfriend-logo-icon.svg" alt="PetFriend Logo" style={{ width: 80, height: 80, margin: "0 auto 16px" }} />
           <h1 style={styles.title}>Welcome Back</h1>
           <p style={styles.subtitle}>Please login to your account</p>
         </div>
