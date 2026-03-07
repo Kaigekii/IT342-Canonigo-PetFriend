@@ -1,6 +1,7 @@
 package com.lab2.backend.controller;
 
 import com.lab2.backend.model.User;
+import com.lab2.backend.model.UserRole;
 import com.lab2.backend.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user")
@@ -33,37 +36,40 @@ public class UserController {
         }
 
         return ResponseEntity.ok(new UserProfile(
-                user.getId(),
+                user.getUserId(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getAge(),
-                user.getGender(),
+                user.getEmail(),
+                user.getPhoneNumber(),
                 user.getAddress(),
-                user.getEmail()
+                user.getRole(),
+                user.getIsVerified()
         ));
     }
 
     public static class UserProfile {
-        private Long id;
+        private UUID userId;
         private String firstName;
         private String lastName;
-        private Integer age;
-        private String gender;
-        private String address;
         private String email;
+        private String phoneNumber;
+        private String address;
+        private UserRole role;
+        private Boolean isVerified;
 
-        public UserProfile(Long id, String firstName, String lastName, Integer age, String gender, String address, String email) {
-            this.id = id;
+        public UserProfile(UUID userId, String firstName, String lastName, String email, String phoneNumber, String address, UserRole role, Boolean isVerified) {
+            this.userId = userId;
             this.firstName = firstName;
             this.lastName = lastName;
-            this.age = age;
-            this.gender = gender;
-            this.address = address;
             this.email = email;
+            this.phoneNumber = phoneNumber;
+            this.address = address;
+            this.role = role;
+            this.isVerified = isVerified;
         }
 
-        public Long getId() {
-            return id;
+        public UUID getUserId() {
+            return userId;
         }
 
         public String getFirstName() {
@@ -74,20 +80,24 @@ public class UserController {
             return lastName;
         }
 
-        public Integer getAge() {
-            return age;
+        public String getEmail() {
+            return email;
         }
 
-        public String getGender() {
-            return gender;
+        public String getPhoneNumber() {
+            return phoneNumber;
         }
 
         public String getAddress() {
             return address;
         }
 
-        public String getEmail() {
-            return email;
+        public UserRole getRole() {
+            return role;
+        }
+
+        public Boolean getIsVerified() {
+            return isVerified;
         }
     }
 }

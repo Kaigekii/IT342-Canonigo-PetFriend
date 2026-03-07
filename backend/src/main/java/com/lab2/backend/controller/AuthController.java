@@ -38,28 +38,39 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Email is already registered");
         }
 
+        // Only sitters need verification; owners don't need it
+        Boolean isVerified = null;
+        if (request.getRole() == com.lab2.backend.model.UserRole.PET_SITTER) {
+            isVerified = false; // Sitters start unverified, require admin approval
+        } else if (request.getRole() == com.lab2.backend.model.UserRole.ADMIN) {
+            isVerified = true; // Admins are pre-verified
+        }
+        // PET_OWNER: isVerified remains null (not applicable)
+
         String hashedPassword = passwordEncoder.encode(request.getPassword());
         User user = new User(
+            request.getEmail(),
+            hashedPassword,
             request.getFirstName(),
             request.getLastName(),
-            request.getAge(),
-            request.getGender(),
+            request.getPhoneNumber(),
             request.getAddress(),
-            request.getEmail(),
-            hashedPassword
+            request.getRole(),
+            isVerified
         );
         userRepository.save(user);
 
         String token = tokenProvider.createToken(user);
         AuthDtos.AuthResponse response = new AuthDtos.AuthResponse(
             token,
-            user.getId(),
+            user.getUserId(),
             user.getFirstName(),
             user.getLastName(),
-            user.getAge(),
-            user.getGender(),
+            user.getEmail(),
+            user.getPhoneNumber(),
             user.getAddress(),
-            user.getEmail()
+            user.getRole(),
+            user.getIsVerified()
         );
         return ResponseEntity.ok(response);
     }
@@ -74,16 +85,22 @@ public class AuthController {
                 (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
 
         User user = userRepository.findByEmail(principal.getUsername()).orElseThrow();
+        
+        // Update last login timestamp
+        user.setLastLoginAt(java.time.Instant.now());
+        userRepository.save(user);
+        
         String token = tokenProvider.createToken(user);
         AuthDtos.AuthResponse response = new AuthDtos.AuthResponse(
             token,
-            user.getId(),
+            user.getUserId(),
             user.getFirstName(),
             user.getLastName(),
-            user.getAge(),
-            user.getGender(),
+            user.getEmail(),
+            user.getPhoneNumber(),
             user.getAddress(),
-            user.getEmail()
+            user.getRole(),
+            user.getIsVerified()
         );
         return ResponseEntity.ok(response);
     }
