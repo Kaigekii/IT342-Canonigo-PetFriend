@@ -15,9 +15,10 @@ class PreferencesManager(context: Context) {
         private const val KEY_FIRST_NAME = "first_name"
         private const val KEY_LAST_NAME = "last_name"
         private const val KEY_EMAIL = "email"
-        private const val KEY_AGE = "age"
-        private const val KEY_GENDER = "gender"
+        private const val KEY_PHONE_NUMBER = "phone_number"
         private const val KEY_ADDRESS = "address"
+        private const val KEY_ROLE = "role"
+        private const val KEY_IS_VERIFIED = "is_verified"
     }
     
     fun saveAuthToken(token: String) {
@@ -37,28 +38,36 @@ class PreferencesManager(context: Context) {
     }
     
     fun saveUserData(
-        id: Long,
+        userId: String,
         firstName: String,
         lastName: String,
         email: String,
-        age: Int?,
-        gender: String?,
-        address: String?
+        phoneNumber: String?,
+        address: String?,
+        role: String?,
+        isVerified: Boolean?
     ) {
         prefs.edit().apply {
-            putLong(KEY_USER_ID, id)
+            putString(KEY_USER_ID, userId)
             putString(KEY_FIRST_NAME, firstName)
             putString(KEY_LAST_NAME, lastName)
             putString(KEY_EMAIL, email)
-            age?.let { putInt(KEY_AGE, it) }
-            gender?.let { putString(KEY_GENDER, it) }
-            address?.let { putString(KEY_ADDRESS, it) }
+            putString(KEY_PHONE_NUMBER, phoneNumber)
+            putString(KEY_ADDRESS, address)
+            putString(KEY_ROLE, role)
+
+            if (isVerified == null) {
+                remove(KEY_IS_VERIFIED)
+            } else {
+                putBoolean(KEY_IS_VERIFIED, isVerified)
+            }
+
             apply()
         }
     }
-    
-    fun getUserId(): Long {
-        return prefs.getLong(KEY_USER_ID, -1)
+
+    fun getUserId(): String? {
+        return prefs.getString(KEY_USER_ID, null)
     }
     
     fun getFirstName(): String? {
@@ -72,17 +81,21 @@ class PreferencesManager(context: Context) {
     fun getEmail(): String? {
         return prefs.getString(KEY_EMAIL, null)
     }
-    
-    fun getAge(): Int {
-        return prefs.getInt(KEY_AGE, 0)
-    }
-    
-    fun getGender(): String? {
-        return prefs.getString(KEY_GENDER, null)
+
+    fun getPhoneNumber(): String? {
+        return prefs.getString(KEY_PHONE_NUMBER, null)
     }
     
     fun getAddress(): String? {
         return prefs.getString(KEY_ADDRESS, null)
+    }
+
+    fun getRole(): String? {
+        return prefs.getString(KEY_ROLE, null)
+    }
+
+    fun getIsVerified(): Boolean? {
+        return if (prefs.contains(KEY_IS_VERIFIED)) prefs.getBoolean(KEY_IS_VERIFIED, false) else null
     }
     
     fun isLoggedIn(): Boolean {

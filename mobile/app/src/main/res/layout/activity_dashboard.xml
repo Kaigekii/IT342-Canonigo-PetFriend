@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#F5F7FA">
+    android:background="@drawable/bg_web_gradient">
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -18,7 +18,7 @@
         android:text="Dashboard"
         android:textSize="32sp"
         android:textStyle="bold"
-        android:textColor="#1A237E"
+        android:textColor="@color/web_surface"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:text="Welcome back!"
         android:textSize="16sp"
-        android:textColor="#607D8B"
+        android:textColor="@color/web_surface"
         android:layout_marginBottom="32dp"/>
 
     <androidx.cardview.widget.CardView
@@ -49,7 +49,7 @@
                 android:text="Profile Information"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#1A237E"
+                android:textColor="@color/web_purple_dark"
                 android:layout_marginBottom="20dp"/>
 
             <LinearLayout
@@ -66,7 +66,7 @@
                     android:text="Name"
                     android:textStyle="bold"
                     android:textSize="15sp"
-                    android:textColor="#5E35B1"/>
+                    android:textColor="@color/web_purple"/>
 
                 <TextView
                     android:id="@+id/tvName"
@@ -91,7 +91,7 @@
                     android:text="Email"
                     android:textStyle="bold"
                     android:textSize="15sp"
-                    android:textColor="#5E35B1"/>
+                    android:textColor="@color/web_purple"/>
 
                 <TextView
                     android:id="@+id/tvEmail"
@@ -104,7 +104,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/llAge"
+                android:id="@+id/llPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -116,13 +116,13 @@
                 <TextView
                     android:layout_width="110dp"
                     android:layout_height="wrap_content"
-                    android:text="Age"
+                    android:text="Phone"
                     android:textStyle="bold"
                     android:textSize="15sp"
-                    android:textColor="#5E35B1"/>
+                    android:textColor="@color/web_purple"/>
 
                 <TextView
-                    android:id="@+id/tvAge"
+                    android:id="@+id/tvPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
@@ -131,7 +131,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/llGender"
+                android:id="@+id/llRole"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -143,13 +143,13 @@
                 <TextView
                     android:layout_width="110dp"
                     android:layout_height="wrap_content"
-                    android:text="Gender"
+                    android:text="Role"
                     android:textStyle="bold"
                     android:textSize="15sp"
-                    android:textColor="#5E35B1"/>
+                    android:textColor="@color/web_purple"/>
 
                 <TextView
-                    android:id="@+id/tvGender"
+                    android:id="@+id/tvRole"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
@@ -172,7 +172,7 @@
                     android:text="Address"
                     android:textStyle="bold"
                     android:textSize="15sp"
-                    android:textColor="#5E35B1"/>
+                    android:textColor="@color/web_purple"/>
 
                 <TextView
                     android:id="@+id/tvAddress"

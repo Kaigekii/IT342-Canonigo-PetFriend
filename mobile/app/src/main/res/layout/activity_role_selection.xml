@@ -9,23 +9,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="32dp"
+        android:padding="16dp"
         android:gravity="center_horizontal">
 
-        <!-- Profile Circle -->
-        <View
+        <!-- App Icon -->
+        <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@drawable/circle_white"
             android:layout_marginTop="48dp"
-            android:layout_marginBottom="32dp" />
+            android:layout_marginBottom="32dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/petfriend_logo_icon" />
 
         <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Choose Your Role"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textColor="@color/gray_dark"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
@@ -121,12 +122,12 @@
         <Button
             android:id="@+id/btnContinue"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="48dp"
             android:text="Continue"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="@color/gray_dark"
             android:textStyle="bold"
-            android:background="@drawable/button_primary"
+            android:background="@drawable/button_owner"
             android:fontFamily="sans-serif-medium"
             android:textAllCaps="false"
             android:enabled="false" />

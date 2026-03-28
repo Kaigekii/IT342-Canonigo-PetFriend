@@ -1,9 +1,5 @@
 package com.example.mobile.network
 
-import com.example.mobile.model.AuthResponse
-import com.example.mobile.model.LoginRequest
-import com.example.mobile.model.RegisterRequest
-import com.example.mobile.model.User
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -19,5 +15,5 @@ interface ApiService {
     suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
     
     @GET("api/user/me")
-    suspend fun getCurrentUser(@Header("Authorization") token: String): Response<User>
+    suspend fun getCurrentUser(@Header("Authorization") token: String): Response<UserProfileResponse>
 }

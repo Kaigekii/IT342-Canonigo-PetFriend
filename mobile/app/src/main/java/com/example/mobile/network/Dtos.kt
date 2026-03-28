@@ -21,5 +21,19 @@ data class AuthResponse(
     val firstName: String,
     val lastName: String,
     val email: String,
-    val role: String
+    val phoneNumber: String? = null,
+    val address: String? = null,
+    val role: String,
+    val isVerified: Boolean? = null
+)
+
+data class UserProfileResponse(
+    val userId: String,
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+    val phoneNumber: String? = null,
+    val address: String? = null,
+    val role: String,
+    val isVerified: Boolean? = null
 )
