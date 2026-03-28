@@ -27,6 +27,7 @@ class SitterRegisterActivity : Activity() {
     private lateinit var btnRegister: Button
     private lateinit var tvLogin: TextView
     private lateinit var tvError: TextView
+    private lateinit var tvBack: TextView
     private lateinit var prefsManager: PreferencesManager
 
     private val job = Job()
@@ -48,6 +49,11 @@ class SitterRegisterActivity : Activity() {
         btnRegister = findViewById(R.id.btnRegister)
         tvLogin = findViewById(R.id.tvLogin)
         tvError = findViewById(R.id.tvError)
+        tvBack = findViewById(R.id.tvBack)
+
+        tvBack.setOnClickListener {
+            finish()
+        }
 
         btnRegister.setOnClickListener {
             registerUser()
