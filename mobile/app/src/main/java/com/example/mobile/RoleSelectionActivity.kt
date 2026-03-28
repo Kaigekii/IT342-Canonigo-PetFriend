@@ -5,12 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 
 class RoleSelectionActivity : Activity() {
     private lateinit var ownerCard: LinearLayout
     private lateinit var sitterCard: LinearLayout
     private lateinit var btnContinue: Button
+    private lateinit var tvBack: TextView
     private var selectedRole: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,8 +22,13 @@ class RoleSelectionActivity : Activity() {
         ownerCard = findViewById(R.id.cardOwner)
         sitterCard = findViewById(R.id.cardSitter)
         btnContinue = findViewById(R.id.btnContinue)
+        tvBack = findViewById(R.id.tvBack)
 
         btnContinue.isEnabled = false
+
+        tvBack.setOnClickListener {
+            finish()
+        }
 
         ownerCard.setOnClickListener {
             selectRole("PET_OWNER")

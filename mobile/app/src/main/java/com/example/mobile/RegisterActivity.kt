@@ -29,6 +29,7 @@ class RegisterActivity : Activity() {
     private lateinit var etAddress: TextInputEditText
     private lateinit var btnRegister: Button
     private lateinit var tvGoToLogin: TextView
+    private lateinit var tvBack: TextView
     
     private lateinit var prefsManager: PreferencesManager
     
@@ -58,6 +59,7 @@ class RegisterActivity : Activity() {
         etAddress = findViewById(R.id.etAddress)
         btnRegister = findViewById(R.id.btnRegister)
         tvGoToLogin = findViewById(R.id.tvGoToLogin)
+        tvBack = findViewById(R.id.tvBack)
     }
     
     private fun setupListeners() {
@@ -66,6 +68,10 @@ class RegisterActivity : Activity() {
         }
         
         tvGoToLogin.setOnClickListener {
+            navigateToLogin()
+        }
+
+        tvBack.setOnClickListener {
             navigateToLogin()
         }
     }
