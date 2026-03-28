@@ -20,6 +20,14 @@
     <color name="primary">#5E35B1</color>
     <color name="primary_dark">#1A237E</color>
     <color name="primary_light">#9575CD</color>
+
+    <!-- Web theme (register/dashboard) -->
+    <color name="web_gradient_start">#667EEA</color>
+    <color name="web_gradient_end">#764BA2</color>
+    <color name="web_purple">#5E35B1</color>
+    <color name="web_purple_dark">#1A237E</color>
+    <color name="web_surface">#FFFFFF</color>
+    <color name="web_bg">#F5F7FA</color>
     <color name="accent">#FF5722</color>
     <color name="accent_light">#FF8A65</color>
     <color name="background">#F5F7FA</color>

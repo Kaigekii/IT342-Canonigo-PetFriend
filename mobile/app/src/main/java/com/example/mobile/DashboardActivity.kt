@@ -22,11 +22,11 @@ class DashboardActivity : Activity() {
     
     private lateinit var tvName: TextView
     private lateinit var tvEmail: TextView
-    private lateinit var tvAge: TextView
-    private lateinit var tvGender: TextView
+    private lateinit var tvPhone: TextView
+    private lateinit var tvRole: TextView
     private lateinit var tvAddress: TextView
-    private lateinit var llAge: LinearLayout
-    private lateinit var llGender: LinearLayout
+    private lateinit var llPhone: LinearLayout
+    private lateinit var llRole: LinearLayout
     private lateinit var llAddress: LinearLayout
     private lateinit var btnLogout: Button
     
@@ -52,11 +52,11 @@ class DashboardActivity : Activity() {
     private fun initViews() {
         tvName = findViewById(R.id.tvName)
         tvEmail = findViewById(R.id.tvEmail)
-        tvAge = findViewById(R.id.tvAge)
-        tvGender = findViewById(R.id.tvGender)
+        tvPhone = findViewById(R.id.tvPhone)
+        tvRole = findViewById(R.id.tvRole)
         tvAddress = findViewById(R.id.tvAddress)
-        llAge = findViewById(R.id.llAge)
-        llGender = findViewById(R.id.llGender)
+        llPhone = findViewById(R.id.llPhone)
+        llRole = findViewById(R.id.llRole)
         llAddress = findViewById(R.id.llAddress)
         btnLogout = findViewById(R.id.btnLogout)
     }
@@ -83,13 +83,14 @@ class DashboardActivity : Activity() {
                         
                         // Update cached data
                         prefsManager.saveUserData(
-                            user.id,
-                            user.firstName,
-                            user.lastName,
-                            user.email,
-                            user.age,
-                            user.gender,
-                            user.address
+                            userId = user.userId,
+                            firstName = user.firstName,
+                            lastName = user.lastName,
+                            email = user.email,
+                            phoneNumber = user.phoneNumber,
+                            address = user.address,
+                            role = user.role,
+                            isVerified = user.isVerified
                         )
                         
                         // Display fresh data
@@ -97,8 +98,8 @@ class DashboardActivity : Activity() {
                             user.firstName,
                             user.lastName,
                             user.email,
-                            user.age,
-                            user.gender,
+                            user.phoneNumber,
+                            user.role,
                             user.address
                         )
                     } else if (response.code() == 401) {
@@ -118,36 +119,36 @@ class DashboardActivity : Activity() {
         val firstName = prefsManager.getFirstName() ?: ""
         val lastName = prefsManager.getLastName() ?: ""
         val email = prefsManager.getEmail() ?: ""
-        val age = prefsManager.getAge()
-        val gender = prefsManager.getGender()
+        val phoneNumber = prefsManager.getPhoneNumber()
+        val role = prefsManager.getRole()
         val address = prefsManager.getAddress()
         
-        displayUserData(firstName, lastName, email, if (age > 0) age else null, gender, address)
+        displayUserData(firstName, lastName, email, phoneNumber, role, address)
     }
     
     private fun displayUserData(
         firstName: String,
         lastName: String,
         email: String,
-        age: Int?,
-        gender: String?,
+        phoneNumber: String?,
+        role: String?,
         address: String?
     ) {
         tvName.text = "$firstName $lastName"
         tvEmail.text = email
         
-        if (age != null && age > 0) {
-            tvAge.text = age.toString()
-            llAge.visibility = View.VISIBLE
+        if (!phoneNumber.isNullOrEmpty()) {
+            tvPhone.text = phoneNumber
+            llPhone.visibility = View.VISIBLE
         } else {
-            llAge.visibility = View.GONE
+            llPhone.visibility = View.GONE
         }
         
-        if (!gender.isNullOrEmpty()) {
-            tvGender.text = gender
-            llGender.visibility = View.VISIBLE
+        if (!role.isNullOrEmpty()) {
+            tvRole.text = role
+            llRole.visibility = View.VISIBLE
         } else {
-            llGender.visibility = View.GONE
+            llRole.visibility = View.GONE
         }
         
         if (!address.isNullOrEmpty()) {

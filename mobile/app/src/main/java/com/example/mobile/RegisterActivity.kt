@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import com.example.mobile.model.RegisterRequest
+import com.example.mobile.network.RegisterRequest
 import com.example.mobile.network.RetrofitClient
 import com.example.mobile.util.PreferencesManager
 import com.google.android.material.textfield.TextInputEditText
@@ -108,22 +108,24 @@ class RegisterActivity : Activity() {
             Toast.makeText(this, "Password is required", Toast.LENGTH_SHORT).show()
             return
         }
-        
-        if (password.length < 6) {
-            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+
+        if (!isValidPassword(password)) {
+            Toast.makeText(
+                this,
+                "Password must be at least 8 characters with 1 uppercase, 1 number, and 1 special character",
+                Toast.LENGTH_LONG
+            ).show()
             return
         }
-        
-        val age = if (ageStr.isNotEmpty()) ageStr.toIntOrNull() else null
-        
+
         val request = RegisterRequest(
             firstName = firstName,
             lastName = lastName,
-            age = age,
-            gender = gender.ifEmpty { null },
-            address = address.ifEmpty { null },
             email = email,
-            password = password
+            password = password,
+            phoneNumber = null,
+            address = address.ifEmpty { null },
+            role = "PET_OWNER"
         )
         
         // Disable button during registration
@@ -139,13 +141,14 @@ class RegisterActivity : Activity() {
                     // Save token and user data
                     prefsManager.saveAuthToken(authResponse.token)
                     prefsManager.saveUserData(
-                        authResponse.id,
-                        authResponse.firstName,
-                        authResponse.lastName,
-                        authResponse.email,
-                        authResponse.age,
-                        authResponse.gender,
-                        authResponse.address
+                        userId = authResponse.userId,
+                        firstName = authResponse.firstName,
+                        lastName = authResponse.lastName,
+                        email = authResponse.email,
+                        phoneNumber = authResponse.phoneNumber,
+                        address = authResponse.address,
+                        role = authResponse.role,
+                        isVerified = authResponse.isVerified
                     )
                     
                     Toast.makeText(this@RegisterActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
@@ -160,6 +163,13 @@ class RegisterActivity : Activity() {
                 btnRegister.isEnabled = true
             }
         }
+    }
+
+    private fun isValidPassword(password: String): Boolean {
+        return password.length >= 8 &&
+                password.any { it.isUpperCase() } &&
+                password.any { it.isDigit() } &&
+                password.any { "!@#\$%^&*(),.?\":{}|<>".contains(it) }
     }
     
     private fun navigateToDashboard() {
