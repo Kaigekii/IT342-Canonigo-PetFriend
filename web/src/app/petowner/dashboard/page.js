@@ -500,7 +500,7 @@ export default function PetOwnerDashboardPage() {
         <nav style={styles.nav} aria-label="Primary">
           <span style={styles.navItemActive}>Dashboard</span>
           <span style={styles.navItem} onClick={() => router.push("/petowner/pets")}>My Pets</span>
-          <span style={styles.navItem}>Find Sitters</span>
+          <span style={styles.navItem} onClick={() => router.push("/petowner/find-sitter")}>Find Sitters</span>
           <span style={styles.navItem}>Bookings</span>
           <span style={styles.navItem}>Messages</span>
         </nav>

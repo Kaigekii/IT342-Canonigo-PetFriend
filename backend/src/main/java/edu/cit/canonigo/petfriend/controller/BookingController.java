@@ -1,19 +1,40 @@
 package edu.cit.canonigo.petfriend.controller;
 
-import edu.cit.canonigo.petfriend.model.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import edu.cit.canonigo.petfriend.model.Booking;
+import edu.cit.canonigo.petfriend.model.BookingStatus;
+import edu.cit.canonigo.petfriend.model.Pet;
+import edu.cit.canonigo.petfriend.model.ServiceType;
+import edu.cit.canonigo.petfriend.model.SitterProfile;
+import edu.cit.canonigo.petfriend.model.User;
+import edu.cit.canonigo.petfriend.model.UserRole;
 import edu.cit.canonigo.petfriend.repository.BookingRepository;
 import edu.cit.canonigo.petfriend.repository.PetRepository;
+import edu.cit.canonigo.petfriend.repository.SitterProfileRepository;
 import edu.cit.canonigo.petfriend.repository.UserRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.*;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -23,11 +44,16 @@ public class BookingController {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final PetRepository petRepository;
+    private final SitterProfileRepository sitterProfileRepository;
 
-    public BookingController(BookingRepository bookingRepository, UserRepository userRepository, PetRepository petRepository) {
+    public BookingController(BookingRepository bookingRepository,
+                             UserRepository userRepository,
+                             PetRepository petRepository,
+                             SitterProfileRepository sitterProfileRepository) {
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
         this.petRepository = petRepository;
+        this.sitterProfileRepository = sitterProfileRepository;
     }
 
     @GetMapping
@@ -97,6 +123,26 @@ public class BookingController {
             return ResponseEntity.status(403).body("You can only book using your own pets");
         }
 
+        if (request.getStartTime().compareTo(request.getEndTime()) >= 0) {
+            return ResponseEntity.badRequest().body("End time must be later than start time");
+        }
+
+        SitterProfile sitterProfile = sitterProfileRepository.findByUser_UserId(sitter.getUserId()).orElse(null);
+        if (sitterProfile == null || sitterProfile.getHourlyRate() == null) {
+            return ResponseEntity.badRequest().body("Sitter hourly rate is not configured");
+        }
+
+        int startMinutes = request.getStartTime().getHour() * 60 + request.getStartTime().getMinute();
+        int endMinutes = request.getEndTime().getHour() * 60 + request.getEndTime().getMinute();
+        BigDecimal durationHours = BigDecimal.valueOf(endMinutes - startMinutes)
+                .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+
+        BigDecimal baseAmount = sitterProfile.getHourlyRate()
+                .multiply(durationHours)
+                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal serviceFee = baseAmount.multiply(new BigDecimal("0.10")).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalAmount = baseAmount.add(serviceFee).setScale(2, RoundingMode.HALF_UP);
+
         Booking booking = new Booking();
         booking.setOwner(owner);
         booking.setSitter(sitter);
@@ -107,6 +153,8 @@ public class BookingController {
         booking.setSpecialInstructions(request.getSpecialInstructions());
         booking.setStatus(BookingStatus.PENDING);
         booking.setPets(new HashSet<>(pets));
+        booking.setTotalAmount(totalAmount);
+        booking.setCurrency("PHP");
 
         Booking saved = bookingRepository.save(booking);
         return ResponseEntity.ok(BookingResponse.from(saved));

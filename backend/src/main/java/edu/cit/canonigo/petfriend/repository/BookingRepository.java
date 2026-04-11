@@ -1,12 +1,13 @@
 package edu.cit.canonigo.petfriend.repository;
 
-import edu.cit.canonigo.petfriend.model.Booking;
-import edu.cit.canonigo.petfriend.model.BookingStatus;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import edu.cit.canonigo.petfriend.model.Booking;
+import edu.cit.canonigo.petfriend.model.BookingStatus;
 
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findByOwner_UserIdOrderByDateAscStartTimeAsc(UUID ownerId);
@@ -32,4 +33,8 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
         BookingStatus status,
         LocalDate date
     );
+
+    List<Booking> findTop5ByOrderByCreatedAtDesc();
+
+    List<Booking> findAllByDateBetween(LocalDate startDate, LocalDate endDate);
 }

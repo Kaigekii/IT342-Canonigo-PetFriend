@@ -48,6 +48,11 @@ export default function DashboardPage() {
           return;
         }
 
+        if (data?.role === "ADMIN") {
+          router.replace("/admin/dashboard");
+          return;
+        }
+
         setUser(data);
       } catch (err) {
         setError(err.message || "Failed to load profile");
