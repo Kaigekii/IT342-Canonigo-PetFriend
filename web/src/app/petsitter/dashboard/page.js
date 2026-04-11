@@ -310,6 +310,7 @@ export default function PetSitterDashboardPage() {
   const [upcomingSessions, setUpcomingSessions] = useState([]);
   const [todaySchedule, setTodaySchedule] = useState([]);
   const [allBookings, setAllBookings] = useState([]);
+  const [reviewSummary, setReviewSummary] = useState({ averageRating: 0, reviewCount: 0 });
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -336,28 +337,34 @@ export default function PetSitterDashboardPage() {
 
     setUser(me);
 
-    const [pendingRes, upcomingRes, todayRes, allRes] = await Promise.all([
+    const [pendingRes, upcomingRes, todayRes, allRes, reviewSummaryRes] = await Promise.all([
       fetch(`${API_BASE}/api/bookings/sitter/pending`, { headers }),
       fetch(`${API_BASE}/api/bookings/sitter/upcoming`, { headers }),
       fetch(`${API_BASE}/api/bookings/sitter/today`, { headers }),
       fetch(`${API_BASE}/api/bookings/sitter`, { headers }),
+      fetch(`${API_BASE}/api/reviews/sitter/${me.userId}/summary`, { headers }),
     ]);
 
-    if (!pendingRes.ok || !upcomingRes.ok || !todayRes.ok || !allRes.ok) {
+    if (!pendingRes.ok || !upcomingRes.ok || !todayRes.ok || !allRes.ok || !reviewSummaryRes.ok) {
       throw new Error("Failed to load sitter bookings");
     }
 
-    const [pendingData, upcomingData, todayData, allData] = await Promise.all([
+    const [pendingData, upcomingData, todayData, allData, reviewSummaryData] = await Promise.all([
       pendingRes.json(),
       upcomingRes.json(),
       todayRes.json(),
       allRes.json(),
+      reviewSummaryRes.json(),
     ]);
 
     setPendingRequests(Array.isArray(pendingData) ? pendingData : []);
     setUpcomingSessions(Array.isArray(upcomingData) ? upcomingData : []);
     setTodaySchedule(Array.isArray(todayData) ? todayData : []);
     setAllBookings(Array.isArray(allData) ? allData : []);
+    setReviewSummary({
+      averageRating: Number(reviewSummaryData?.averageRating ?? 0),
+      reviewCount: Number(reviewSummaryData?.reviewCount ?? 0),
+    });
   }, [router]);
 
   useEffect(() => {
@@ -472,7 +479,7 @@ export default function PetSitterDashboardPage() {
         <h1 style={styles.title}>Welcome, {user?.firstName || "Pet Sitter"}</h1>
         <div style={styles.helperRow}>
           <span style={styles.verifiedBadge}>{user?.isVerified ? "Verified" : "Pending Verification"}</span>
-          <span style={styles.ratingText}>⭐ 4.9 (24 reviews)</span>
+          <span style={styles.ratingText}>⭐ {reviewSummary.averageRating.toFixed(1)} ({reviewSummary.reviewCount} reviews)</span>
         </div>
 
         {error && <div style={styles.errorBox}>{error}</div>}

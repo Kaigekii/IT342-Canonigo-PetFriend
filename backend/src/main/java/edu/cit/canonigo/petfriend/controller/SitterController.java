@@ -2,13 +2,11 @@ package edu.cit.canonigo.petfriend.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.cit.canonigo.petfriend.model.Booking;
-import edu.cit.canonigo.petfriend.model.BookingStatus;
 import edu.cit.canonigo.petfriend.model.ServiceType;
 import edu.cit.canonigo.petfriend.model.SitterProfile;
 import edu.cit.canonigo.petfriend.model.User;
 import edu.cit.canonigo.petfriend.model.UserRole;
-import edu.cit.canonigo.petfriend.repository.BookingRepository;
+import edu.cit.canonigo.petfriend.repository.ReviewRepository;
 import edu.cit.canonigo.petfriend.repository.SitterProfileRepository;
 import edu.cit.canonigo.petfriend.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -39,16 +34,16 @@ public class SitterController {
 
     private final UserRepository userRepository;
     private final SitterProfileRepository sitterProfileRepository;
-    private final BookingRepository bookingRepository;
+    private final ReviewRepository reviewRepository;
     private final ObjectMapper objectMapper;
 
     public SitterController(UserRepository userRepository,
                             SitterProfileRepository sitterProfileRepository,
-                            BookingRepository bookingRepository,
+                            ReviewRepository reviewRepository,
                             ObjectMapper objectMapper) {
         this.userRepository = userRepository;
         this.sitterProfileRepository = sitterProfileRepository;
-        this.bookingRepository = bookingRepository;
+        this.reviewRepository = reviewRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -56,7 +51,6 @@ public class SitterController {
     public ResponseEntity<?> searchSitters(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(name = "location", required = false) String location,
-            @RequestParam(name = "date", required = false) String dateText,
             @RequestParam(name = "serviceType", required = false) String serviceTypeText
     ) {
         User owner = getAuthenticatedOwner(userDetails);
@@ -67,7 +61,6 @@ public class SitterController {
             return ResponseEntity.status(403).body("Forbidden");
         }
 
-        LocalDate requestedDate = parseDateOrNull(dateText);
         ServiceType requestedServiceType = parseServiceTypeOrNull(serviceTypeText);
 
         List<SitterSummaryResponse> results = new ArrayList<>();
@@ -84,13 +77,8 @@ public class SitterController {
 
             SitterProfile profile = profileOpt.get();
             List<String> services = parseServices(profile.getServicesJson());
-            Map<String, SitterProfileController.DayAvailability> schedule = parseSchedule(profile.getAvailabilityJson());
 
             if (requestedServiceType != null && !offersService(services, requestedServiceType)) {
-                continue;
-            }
-
-            if (requestedDate != null && !isAvailableOnDate(schedule, requestedDate)) {
                 continue;
             }
 
@@ -171,18 +159,6 @@ public class SitterController {
         return user;
     }
 
-    private LocalDate parseDateOrNull(String dateText) {
-        if (dateText == null || dateText.isBlank()) {
-            return null;
-        }
-
-        try {
-            return LocalDate.parse(dateText.trim());
-        } catch (Exception ignored) {
-            return null;
-        }
-    }
-
     private ServiceType parseServiceTypeOrNull(String value) {
         if (value == null || value.isBlank()) {
             return null;
@@ -232,27 +208,6 @@ public class SitterController {
         return services.stream().anyMatch(service -> service.equalsIgnoreCase(target) || service.equalsIgnoreCase(serviceType.name()));
     }
 
-    private boolean isAvailableOnDate(Map<String, SitterProfileController.DayAvailability> schedule, LocalDate date) {
-        if (schedule == null || schedule.isEmpty()) {
-            return true;
-        }
-
-        String fullKey = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ROOT).toLowerCase(Locale.ROOT);
-        String shortKey = fullKey.substring(0, Math.min(3, fullKey.length()));
-
-        SitterProfileController.DayAvailability row = schedule.get(fullKey);
-        if (row == null) {
-            row = schedule.get(shortKey);
-        }
-
-        if (row == null) {
-            return false;
-        }
-
-        return row.getStartTime() != null && !row.getStartTime().isBlank()
-                && row.getEndTime() != null && !row.getEndTime().isBlank();
-    }
-
     private String safeName(User user) {
         String first = user.getFirstName() == null ? "" : user.getFirstName().trim();
         String last = user.getLastName() == null ? "" : user.getLastName().trim();
@@ -261,51 +216,30 @@ public class SitterController {
     }
 
     private RatingInfo buildRatingInfo(UUID sitterId) {
-        List<Booking> bookings = bookingRepository.findBySitter_UserIdOrderByDateAscStartTimeAsc(sitterId);
-        long completed = bookings.stream().filter(b -> b.getStatus() == BookingStatus.COMPLETED).count();
-        long confirmed = bookings.stream().filter(b -> b.getStatus() == BookingStatus.CONFIRMED).count();
-        long activity = completed + confirmed;
-
-        if (activity == 0) {
-            return new RatingInfo(new BigDecimal("4.5"), 0);
-        }
-
-        BigDecimal rating = BigDecimal.valueOf(4.4 + Math.min(0.5, activity * 0.03))
-                .setScale(1, RoundingMode.HALF_UP);
-        int reviewCount = (int) Math.max(1, completed);
+        long reviewCount = reviewRepository.countBySitter_UserId(sitterId);
+        Double avg = reviewRepository.findAverageRatingBySitterId(sitterId);
+        BigDecimal rating = BigDecimal.valueOf(avg == null ? 0.0 : avg).setScale(1, java.math.RoundingMode.HALF_UP);
         return new RatingInfo(rating, reviewCount);
     }
 
-    private List<ReviewItem> buildReviewsFromCompletedBookings(UUID sitterId) {
-        List<Booking> bookings = bookingRepository.findBySitter_UserIdOrderByDateAscStartTimeAsc(sitterId);
-
-        List<ReviewItem> reviews = bookings.stream()
-                .filter(b -> b.getStatus() == BookingStatus.COMPLETED)
-                .sorted((a, b) -> b.getDate().compareTo(a.getDate()))
-                .limit(3)
-                .map(b -> new ReviewItem(
-                        b.getOwner().getFirstName() + " " + b.getOwner().getLastName(),
-                        b.getDate().toString(),
-                        5,
-                        "Great service, very caring and responsible with pets."
-                ))
-                .toList();
-
-        if (!reviews.isEmpty()) {
-            return reviews;
-        }
-
-        return List.of(
-                new ReviewItem("PetFriend User", LocalDate.now().minusDays(12).toString(), 5, "Friendly, reliable, and very patient with pets."),
-                new ReviewItem("PetFriend User", LocalDate.now().minusDays(27).toString(), 4, "Good communication and punctual service.")
-        );
+        private List<ReviewItem> buildReviewsFromCompletedBookings(UUID sitterId) {
+        return reviewRepository.findBySitter_UserIdOrderByCreatedAtDesc(sitterId)
+            .stream()
+            .limit(10)
+            .map(r -> new ReviewItem(
+                r.getReviewer().getFirstName() + " " + r.getReviewer().getLastName(),
+                r.getCreatedAt().atOffset(java.time.ZoneOffset.UTC).toLocalDate().toString(),
+                r.getRating(),
+                r.getComment()
+            ))
+            .toList();
     }
 
     private static class RatingInfo {
         private final BigDecimal rating;
-        private final int reviewCount;
+        private final long reviewCount;
 
-        private RatingInfo(BigDecimal rating, int reviewCount) {
+        private RatingInfo(BigDecimal rating, long reviewCount) {
             this.rating = rating;
             this.reviewCount = reviewCount;
         }
@@ -319,7 +253,7 @@ public class SitterController {
         private final BigDecimal hourlyRate;
         private final List<String> servicesOffered;
         private final BigDecimal rating;
-        private final int reviewCount;
+        private final long reviewCount;
         private final boolean verified;
         private final String location;
 
@@ -330,7 +264,7 @@ public class SitterController {
                                      BigDecimal hourlyRate,
                                      List<String> servicesOffered,
                                      BigDecimal rating,
-                                     int reviewCount,
+                                     long reviewCount,
                                      boolean verified,
                                      String location) {
             this.sitterId = sitterId;
@@ -373,7 +307,7 @@ public class SitterController {
             return rating;
         }
 
-        public int getReviewCount() {
+        public long getReviewCount() {
             return reviewCount;
         }
 
@@ -395,7 +329,7 @@ public class SitterController {
         private final List<String> servicesOffered;
         private final Map<String, SitterProfileController.DayAvailability> availabilitySchedule;
         private final BigDecimal rating;
-        private final int reviewCount;
+        private final long reviewCount;
         private final boolean verified;
         private final List<ReviewItem> reviews;
 
@@ -407,7 +341,7 @@ public class SitterController {
                                     List<String> servicesOffered,
                                     Map<String, SitterProfileController.DayAvailability> availabilitySchedule,
                                     BigDecimal rating,
-                                    int reviewCount,
+                                    long reviewCount,
                                     boolean verified,
                                     List<ReviewItem> reviews) {
             this.sitterId = sitterId;
@@ -455,7 +389,7 @@ public class SitterController {
             return rating;
         }
 
-        public int getReviewCount() {
+        public long getReviewCount() {
             return reviewCount;
         }
 
