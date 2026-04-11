@@ -1,6 +1,7 @@
 package edu.cit.canonigo.petfriend.config;
 
-import edu.cit.canonigo.petfriend.security.JwtAuthenticationFilter;
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,13 +16,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import edu.cit.canonigo.petfriend.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableMethodSecurity
@@ -41,6 +43,20 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(authenticationEntryPoint())
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    if ("/api/auth/login".equals(request.getRequestURI())) {
+                    response.setStatus(401);
+                                response.setContentType("text/plain;charset=UTF-8");
+                                response.getWriter().write("Email or password is incorrect");
+                    return;
+                    }
+                    response.setStatus(403);
+                            response.setContentType("text/plain;charset=UTF-8");
+                            response.getWriter().write("Forbidden");
+                })
+            )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/error").permitAll()
                         .anyRequest().authenticated()
@@ -87,6 +103,15 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> {
+            response.setStatus(401);
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("Unauthorized");
+        };
     }
 
     @Bean
