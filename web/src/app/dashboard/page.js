@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -18,7 +20,7 @@ export default function DashboardPage() {
 
     const fetchMe = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/user/me", {
+        const res = await fetch(`${API_BASE}/api/user/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -35,6 +37,12 @@ export default function DashboardPage() {
         }
 
         const data = await res.json();
+
+        if (data?.role === "PET_OWNER") {
+          router.replace("/petowner/dashboard");
+          return;
+        }
+
         setUser(data);
       } catch (err) {
         setError(err.message || "Failed to load profile");
@@ -53,100 +61,141 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-solid border-white border-t-transparent mb-4"></div>
-          <p className="text-lg text-white">Loading...</p>
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <p style={styles.subtitle}>Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-      <div className="w-full max-w-3xl">
-        {error && (
-          <div className="mb-6 p-3 rounded-lg" style={{ background: '#FFEBEE', border: '1px solid #FFCDD2', color: '#C62828' }}>
-            <p className="text-sm">{error}</p>
-          </div>
-        )}
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <div style={styles.header}>
+          <h1 style={styles.title}>Dashboard</h1>
+          <p style={styles.subtitle}>{user ? `Welcome back, ${user.firstName}!` : ""}</p>
+        </div>
+
+        {error && <div style={styles.errorBox}>{error}</div>}
 
         {user ? (
-          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-600" style={{ padding: '2rem 2rem' }}>
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                    Dashboard
-                  </h1>
-                  <p className="text-sm md:text-base" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                    Welcome back, {user.firstName}!
-                  </p>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="text-white font-semibold hover:bg-white hover:text-purple-600 transition-all border-2 border-white rounded-lg"
-                  style={{ 
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    padding: '0.875rem 2rem',
-                    fontSize: '1rem',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  Logout
-                </button>
+          <div>
+            <div style={styles.profileGrid}>
+              <div>
+                <div style={styles.label}>FIRST NAME</div>
+                <div style={styles.value}>{user.firstName}</div>
+              </div>
+              <div>
+                <div style={styles.label}>LAST NAME</div>
+                <div style={styles.value}>{user.lastName}</div>
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <div style={styles.label}>EMAIL</div>
+                <div style={styles.value}>{user.email}</div>
+              </div>
+              <div>
+                <div style={styles.label}>ROLE</div>
+                <div style={styles.value}>{user.role}</div>
+              </div>
+              <div>
+                <div style={styles.label}>VERIFIED</div>
+                <div style={styles.value}>{String(user.isVerified ?? "N/A")}</div>
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <div style={styles.label}>PHONE</div>
+                <div style={styles.value}>{user.phoneNumber || "—"}</div>
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <div style={styles.label}>ADDRESS</div>
+                <div style={styles.value}>{user.address || "—"}</div>
               </div>
             </div>
 
-            <div style={{ padding: '2.5rem 2rem' }}>
-              <h2 className="text-xl font-bold mb-6" style={{ color: '#1A237E' }}>
-                Profile Information
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-1">
-                  <p className="text-xs font-medium" style={{ color: '#78909C' }}>FIRST NAME</p>
-                  <p className="text-lg font-semibold" style={{ color: '#263238' }}>{user.firstName}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-xs font-medium" style={{ color: '#78909C' }}>LAST NAME</p>
-                  <p className="text-lg font-semibold" style={{ color: '#263238' }}>{user.lastName}</p>
-                </div>
-
-                <div className="space-y-1 md:col-span-2">
-                  <p className="text-xs font-medium" style={{ color: '#78909C' }}>EMAIL</p>
-                  <p className="text-lg font-semibold" style={{ color: '#263238' }}>{user.email}</p>
-                </div>
-
-                {user.age && (
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium" style={{ color: '#78909C' }}>AGE</p>
-                    <p className="text-lg font-semibold" style={{ color: '#263238' }}>{user.age}</p>
-                  </div>
-                )}
-
-                {user.gender && (
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium" style={{ color: '#78909C' }}>GENDER</p>
-                    <p className="text-lg font-semibold" style={{ color: '#263238' }}>{user.gender}</p>
-                  </div>
-                )}
-
-                {user.address && (
-                  <div className="space-y-1 md:col-span-2">
-                    <p className="text-xs font-medium" style={{ color: '#78909C' }}>ADDRESS</p>
-                    <p className="text-lg font-semibold" style={{ color: '#263238' }}>{user.address}</p>
-                  </div>
-                )}
-              </div>
+            <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end" }}>
+              <button type="button" onClick={handleLogout} style={styles.button}>
+                Logout
+              </button>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-3xl shadow-2xl text-center" style={{ padding: '3rem 2rem' }}>
-            <p className="text-base" style={{ color: '#78909C' }}>No user data available.</p>
-          </div>
+          <p style={styles.subtitle}>No user data available.</p>
         )}
       </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "32px 16px",
+    backgroundColor: "#FFF8F0",
+  },
+  card: {
+    width: "100%",
+    maxWidth: "760px",
+    backgroundColor: "#FFF8F0",
+    borderRadius: "16px",
+    padding: "32px",
+    boxShadow: "0px 2px 6px rgba(0,0,0,0.05)",
+    border: "1px solid #D3D3D3",
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: "24px",
+  },
+  title: {
+    fontSize: "20px",
+    fontWeight: 600,
+    color: "#333333",
+    marginBottom: "8px",
+  },
+  subtitle: {
+    fontSize: "14px",
+    fontWeight: 400,
+    color: "#D3D3D3",
+  },
+  errorBox: {
+    padding: "12px",
+    borderRadius: "10px",
+    backgroundColor: "#FFCCBC",
+    border: "2px solid #FFCCBC",
+    color: "#333333",
+    fontSize: "14px",
+    marginBottom: "16px",
+  },
+  profileGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "16px",
+  },
+  label: {
+    fontSize: "12px",
+    fontWeight: 600,
+    color: "#333333",
+    opacity: 0.65,
+    marginBottom: "6px",
+    letterSpacing: "0.08em",
+  },
+  value: {
+    fontSize: "14px",
+    fontWeight: 600,
+    color: "#333333",
+    lineHeight: 1.5,
+  },
+  button: {
+    minHeight: 44,
+    padding: "12px 16px",
+    borderRadius: 12,
+    backgroundColor: "#FFD8B9",
+    border: "2px solid #FFD8B9",
+    color: "#333333",
+    fontSize: "14px",
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+};
