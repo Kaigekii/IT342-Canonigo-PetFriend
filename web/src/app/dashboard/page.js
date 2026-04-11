@@ -43,6 +43,11 @@ export default function DashboardPage() {
           return;
         }
 
+        if (data?.role === "PET_SITTER") {
+          router.replace("/petsitter/dashboard");
+          return;
+        }
+
         setUser(data);
       } catch (err) {
         setError(err.message || "Failed to load profile");
