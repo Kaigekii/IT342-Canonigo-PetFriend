@@ -16,4 +16,20 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             LocalDate date,
             BookingStatus status
     );
+
+    List<Booking> findBySitter_UserIdOrderByDateAscStartTimeAsc(UUID sitterId);
+
+    List<Booking> findBySitter_UserIdAndStatusOrderByDateAscStartTimeAsc(UUID sitterId, BookingStatus status);
+
+    List<Booking> findBySitter_UserIdAndStatusAndDateGreaterThanEqualOrderByDateAscStartTimeAsc(
+        UUID sitterId,
+        BookingStatus status,
+        LocalDate date
+    );
+
+    List<Booking> findBySitter_UserIdAndStatusAndDateOrderByStartTimeAsc(
+        UUID sitterId,
+        BookingStatus status,
+        LocalDate date
+    );
 }

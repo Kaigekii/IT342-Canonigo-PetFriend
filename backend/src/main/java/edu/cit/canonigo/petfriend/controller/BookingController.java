@@ -112,6 +112,139 @@ public class BookingController {
         return ResponseEntity.ok(BookingResponse.from(saved));
     }
 
+    @GetMapping("/sitter")
+    public ResponseEntity<?> listSitterBookings(@AuthenticationPrincipal UserDetails userDetails) {
+        User sitter = getAuthenticatedUser(userDetails);
+        if (sitter == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        if (sitter.getRole() != UserRole.PET_SITTER) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
+        List<BookingResponse> responses = bookingRepository
+                .findBySitter_UserIdOrderByDateAscStartTimeAsc(sitter.getUserId())
+                .stream()
+                .map(BookingResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/sitter/pending")
+    public ResponseEntity<?> listSitterPendingRequests(@AuthenticationPrincipal UserDetails userDetails) {
+        User sitter = getAuthenticatedUser(userDetails);
+        if (sitter == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        if (sitter.getRole() != UserRole.PET_SITTER) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
+        List<BookingResponse> responses = bookingRepository
+                .findBySitter_UserIdAndStatusOrderByDateAscStartTimeAsc(sitter.getUserId(), BookingStatus.PENDING)
+                .stream()
+                .map(BookingResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/sitter/upcoming")
+    public ResponseEntity<?> listSitterUpcomingSessions(@AuthenticationPrincipal UserDetails userDetails) {
+        User sitter = getAuthenticatedUser(userDetails);
+        if (sitter == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        if (sitter.getRole() != UserRole.PET_SITTER) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
+        List<BookingResponse> responses = bookingRepository
+                .findBySitter_UserIdAndStatusAndDateGreaterThanEqualOrderByDateAscStartTimeAsc(
+                        sitter.getUserId(),
+                        BookingStatus.CONFIRMED,
+                        LocalDate.now()
+                )
+                .stream()
+                .map(BookingResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/sitter/today")
+    public ResponseEntity<?> listSitterTodaySchedule(@AuthenticationPrincipal UserDetails userDetails) {
+        User sitter = getAuthenticatedUser(userDetails);
+        if (sitter == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        if (sitter.getRole() != UserRole.PET_SITTER) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
+        List<BookingResponse> responses = bookingRepository
+                .findBySitter_UserIdAndStatusAndDateOrderByStartTimeAsc(
+                        sitter.getUserId(),
+                        BookingStatus.CONFIRMED,
+                        LocalDate.now()
+                )
+                .stream()
+                .map(BookingResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @PutMapping("/{bookingId}/sitter-status")
+    public ResponseEntity<?> updateSitterBookingStatus(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable UUID bookingId,
+            @Valid @RequestBody UpdateSitterBookingStatusRequest request
+    ) {
+        User sitter = getAuthenticatedUser(userDetails);
+        if (sitter == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        if (sitter.getRole() != UserRole.PET_SITTER) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null) {
+            return ResponseEntity.status(404).body("Booking not found");
+        }
+
+        if (booking.getSitter() == null || !booking.getSitter().getUserId().equals(sitter.getUserId())) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
+        BookingStatus nextStatus = request.getStatus();
+        BookingStatus currentStatus = booking.getStatus();
+
+        if (!isAllowedSitterTransition(currentStatus, nextStatus)) {
+            return ResponseEntity.badRequest().body("Invalid status transition");
+        }
+
+        booking.setStatus(nextStatus);
+        Booking updated = bookingRepository.save(booking);
+        return ResponseEntity.ok(BookingResponse.from(updated));
+    }
+
+    private User getAuthenticatedUser(UserDetails userDetails) {
+        if (userDetails == null) {
+            return null;
+        }
+        return userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+    }
+
+    private boolean isAllowedSitterTransition(BookingStatus currentStatus, BookingStatus nextStatus) {
+        if (currentStatus == BookingStatus.PENDING && (nextStatus == BookingStatus.CONFIRMED || nextStatus == BookingStatus.CANCELLED)) {
+            return true;
+        }
+        return currentStatus == BookingStatus.CONFIRMED && nextStatus == BookingStatus.COMPLETED;
+    }
+
     public static class CreateBookingRequest {
         @NotNull
         private UUID sitterId;
@@ -190,9 +323,23 @@ public class BookingController {
         }
     }
 
+    public static class UpdateSitterBookingStatusRequest {
+        @NotNull
+        private BookingStatus status;
+
+        public BookingStatus getStatus() {
+            return status;
+        }
+
+        public void setStatus(BookingStatus status) {
+            this.status = status;
+        }
+    }
+
     public static class BookingResponse {
         private UUID bookingId;
         private UUID ownerId;
+        private String ownerName;
         private UUID sitterId;
         private String sitterName;
         private ServiceType serviceType;
@@ -200,12 +347,16 @@ public class BookingController {
         private java.time.LocalTime startTime;
         private java.time.LocalTime endTime;
         private BookingStatus status;
+        private List<String> petNames;
         private List<UUID> petIds;
+        private java.math.BigDecimal totalAmount;
+        private String currency;
 
         public static BookingResponse from(Booking booking) {
             BookingResponse r = new BookingResponse();
             r.bookingId = booking.getBookingId();
             r.ownerId = booking.getOwner().getUserId();
+                r.ownerName = booking.getOwner().getFirstName() + " " + booking.getOwner().getLastName();
             r.sitterId = booking.getSitter() != null ? booking.getSitter().getUserId() : null;
             r.sitterName = booking.getSitter() != null
                     ? booking.getSitter().getFirstName() + " " + booking.getSitter().getLastName()
@@ -215,7 +366,10 @@ public class BookingController {
             r.startTime = booking.getStartTime();
             r.endTime = booking.getEndTime();
             r.status = booking.getStatus();
+                r.petNames = booking.getPets().stream().map(Pet::getName).toList();
             r.petIds = booking.getPets().stream().map(Pet::getPetId).toList();
+                r.totalAmount = booking.getTotalAmount();
+                r.currency = booking.getCurrency();
             return r;
         }
 
@@ -225,6 +379,10 @@ public class BookingController {
 
         public UUID getOwnerId() {
             return ownerId;
+        }
+
+        public String getOwnerName() {
+            return ownerName;
         }
 
         public UUID getSitterId() {
@@ -255,8 +413,20 @@ public class BookingController {
             return status;
         }
 
+        public List<String> getPetNames() {
+            return petNames;
+        }
+
         public List<UUID> getPetIds() {
             return petIds;
+        }
+
+        public java.math.BigDecimal getTotalAmount() {
+            return totalAmount;
+        }
+
+        public String getCurrency() {
+            return currency;
         }
     }
 }
