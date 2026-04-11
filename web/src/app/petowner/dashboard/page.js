@@ -397,6 +397,7 @@ export default function PetOwnerDashboardPage() {
   const [pets, setPets] = useState([]);
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [allBookings, setAllBookings] = useState([]);
+  const [reviewedBookingIds, setReviewedBookingIds] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -440,13 +441,14 @@ export default function PetOwnerDashboardPage() {
 
         setUser(me);
 
-        const [petsRes, upcomingRes, allRes] = await Promise.all([
+        const [petsRes, upcomingRes, allRes, reviewedRes] = await Promise.all([
           fetch(`${API_BASE}/api/pets`, { headers: authHeaders }),
           fetch(`${API_BASE}/api/bookings?upcoming=true`, { headers: authHeaders }),
           fetch(`${API_BASE}/api/bookings`, { headers: authHeaders }),
+          fetch(`${API_BASE}/api/reviews/me/reviewed-bookings`, { headers: authHeaders }),
         ]);
 
-        if (petsRes.status === 401 || upcomingRes.status === 401 || allRes.status === 401) {
+        if (petsRes.status === 401 || upcomingRes.status === 401 || allRes.status === 401 || reviewedRes.status === 401) {
           localStorage.removeItem("token");
           router.replace("/login");
           return;
@@ -454,14 +456,19 @@ export default function PetOwnerDashboardPage() {
 
         if (!petsRes.ok) throw new Error("Failed to load pets");
         if (!upcomingRes.ok || !allRes.ok) throw new Error("Failed to load bookings");
+        if (!reviewedRes.ok) throw new Error("Failed to load review stats");
 
-        const petsData = await petsRes.json();
-        const upcomingData = await upcomingRes.json();
-        const allData = await allRes.json();
+        const [petsData, upcomingData, allData, reviewedData] = await Promise.all([
+          petsRes.json(),
+          upcomingRes.json(),
+          allRes.json(),
+          reviewedRes.json(),
+        ]);
 
         setPets(Array.isArray(petsData) ? petsData : []);
         setUpcomingBookings(Array.isArray(upcomingData) ? upcomingData : []);
         setAllBookings(Array.isArray(allData) ? allData : []);
+        setReviewedBookingIds(Array.isArray(reviewedData) ? reviewedData : []);
       } catch (e) {
         setError(e?.message || "Something went wrong");
       } finally {
@@ -490,7 +497,9 @@ export default function PetOwnerDashboardPage() {
   }, []);
 
   const completedCount = allBookings.filter((b) => b.status === "COMPLETED").length;
-  const pendingReviews = completedCount;
+  const pendingReviews = allBookings
+    .filter((b) => b.status === "COMPLETED")
+    .filter((b) => !reviewedBookingIds.includes(b.bookingId)).length;
   const primaryUpcoming = upcomingBookings[0] || null;
 
   return (

@@ -312,6 +312,11 @@ export default function SitterDetailPage() {
   const [endTime, setEndTime] = useState("10:00");
   const [petId, setPetId] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
+  const [reviewBookingId, setReviewBookingId] = useState("");
+  const [reviewRating, setReviewRating] = useState("5");
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewableBookings, setReviewableBookings] = useState([]);
 
   const ensureOwner = useCallback(async (authToken) => {
     const meRes = await fetch(`${API_BASE}/api/user/me`, {
@@ -358,16 +363,24 @@ export default function SitterDetailPage() {
         const ok = await ensureOwner(token);
         if (!ok) return;
 
-        const [sitterRes, petsRes] = await Promise.all([
+        const [sitterRes, petsRes, myBookingsRes, reviewedRes] = await Promise.all([
           fetch(`${API_BASE}/api/sitters/${sitterId}`, { headers: { Authorization: `Bearer ${token}` } }),
           fetch(`${API_BASE}/api/pets`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_BASE}/api/bookings`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_BASE}/api/reviews/me/reviewed-bookings`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         if (!sitterRes.ok) throw new Error("Failed to load sitter details");
         if (!petsRes.ok) throw new Error("Failed to load pets");
+        if (!myBookingsRes.ok) throw new Error("Failed to load bookings");
+        if (!reviewedRes.ok) throw new Error("Failed to load reviewed bookings");
 
-        const sitterData = await sitterRes.json();
-        const petsData = await petsRes.json();
+        const [sitterData, petsData, myBookingsData, reviewedIds] = await Promise.all([
+          sitterRes.json(),
+          petsRes.json(),
+          myBookingsRes.json(),
+          reviewedRes.json(),
+        ]);
 
         setSitter(sitterData);
         setPets(Array.isArray(petsData) ? petsData : []);
@@ -378,6 +391,15 @@ export default function SitterDetailPage() {
         const services = Array.isArray(sitterData?.servicesOffered) ? sitterData.servicesOffered : [];
         if (services.length > 0) {
           setServiceType(String(services[0]).toUpperCase());
+        }
+
+        const reviewedSet = new Set(Array.isArray(reviewedIds) ? reviewedIds : []);
+        const eligible = (Array.isArray(myBookingsData) ? myBookingsData : [])
+          .filter((b) => b?.status === "COMPLETED" && b?.sitterId === sitterId)
+          .filter((b) => !reviewedSet.has(b.bookingId));
+        setReviewableBookings(eligible);
+        if (eligible.length > 0) {
+          setReviewBookingId(eligible[0].bookingId);
         }
       } catch (err) {
         setError(err?.message || "Unable to load sitter details.");
@@ -454,6 +476,60 @@ export default function SitterDetailPage() {
       setError(err?.message || "Unable to create booking.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const submitReview = async () => {
+    if (!token) return;
+    if (!reviewBookingId) {
+      setError("No completed booking available for review.");
+      return;
+    }
+    if (!reviewComment.trim()) {
+      setError("Please enter a review comment.");
+      return;
+    }
+
+    setReviewSubmitting(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await fetch(`${API_BASE}/api/reviews`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookingId: reviewBookingId,
+          rating: Number(reviewRating),
+          comment: reviewComment,
+        }),
+      });
+
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || "Failed to submit review");
+      }
+
+      const refreshRes = await fetch(`${API_BASE}/api/sitters/${sitterId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (refreshRes.ok) {
+        const refreshed = await refreshRes.json();
+        setSitter(refreshed);
+      }
+
+      setReviewableBookings((prev) => prev.filter((b) => b.bookingId !== reviewBookingId));
+      setReviewBookingId("");
+      setReviewComment("");
+      setReviewRating("5");
+      setSuccess("Review submitted. Thank you for your feedback.");
+    } catch (err) {
+      setError(err?.message || "Unable to submit review.");
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -553,6 +629,45 @@ export default function SitterDetailPage() {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                <div style={styles.panel}>
+                  <h2 style={styles.panelTitle}>Leave a Review</h2>
+                  {reviewableBookings.length === 0 ? (
+                    <div style={styles.empty}>No completed booking pending review for this sitter yet.</div>
+                  ) : (
+                    <>
+                      <div style={styles.formLabel}>Completed Booking</div>
+                      <select style={styles.input} value={reviewBookingId} onChange={(e) => setReviewBookingId(e.target.value)}>
+                        {reviewableBookings.map((b) => (
+                          <option key={b.bookingId} value={b.bookingId}>
+                            {b.date} {b.startTime?.slice(0, 5)}-{b.endTime?.slice(0, 5)} ({b.serviceType})
+                          </option>
+                        ))}
+                      </select>
+
+                      <div style={styles.formLabel}>Rating</div>
+                      <select style={styles.input} value={reviewRating} onChange={(e) => setReviewRating(e.target.value)}>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Very Good</option>
+                        <option value="3">3 - Good</option>
+                        <option value="2">2 - Fair</option>
+                        <option value="1">1 - Poor</option>
+                      </select>
+
+                      <div style={styles.formLabel}>Comment</div>
+                      <textarea
+                        style={styles.textArea}
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder="Share your experience with this sitter..."
+                      />
+
+                      <button type="button" style={styles.confirmBtn} onClick={submitReview} disabled={reviewSubmitting}>
+                        {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 

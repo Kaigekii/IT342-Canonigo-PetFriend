@@ -98,7 +98,7 @@ const styles = {
     padding: 14,
     marginBottom: 20,
   },
-  searchGrid: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: 14, alignItems: "end" },
+  searchGrid: { display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 14, alignItems: "end" },
   fieldLabel: {
     fontSize: 12,
     color: "#7A7A7A",
@@ -196,14 +196,6 @@ function formatRate(rate) {
   return `P${num.toFixed(0)}/hr`;
 }
 
-function todayString() {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-
 export default function FindSitterPage() {
   const router = useRouter();
   const menuRef = useRef(null);
@@ -214,7 +206,6 @@ export default function FindSitterPage() {
   }, []);
 
   const [location, setLocation] = useState("Cebu City");
-  const [date, setDate] = useState(todayString());
   const [serviceType, setServiceType] = useState("ALL");
   const [sitters, setSitters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -264,7 +255,6 @@ export default function FindSitterPage() {
 
       const params = new URLSearchParams();
       params.set("location", location);
-      params.set("date", date);
       params.set("serviceType", serviceType);
 
       const res = await fetch(`${API_BASE}/api/sitters/search?${params.toString()}`, {
@@ -283,7 +273,7 @@ export default function FindSitterPage() {
       setSearching(false);
       setLoading(false);
     }
-  }, [date, ensureOwner, location, serviceType]);
+  }, [ensureOwner, location, serviceType]);
 
   useEffect(() => {
     if (!token) {
@@ -351,10 +341,6 @@ export default function FindSitterPage() {
               <input style={styles.input} value={location} onChange={(e) => setLocation(e.target.value)} />
             </div>
             <div>
-              <div style={styles.fieldLabel}>Date</div>
-              <input style={styles.input} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
-            <div>
               <div style={styles.fieldLabel}>Service Type</div>
               <select style={styles.input} value={serviceType} onChange={(e) => setServiceType(e.target.value)}>
                 <option value="ALL">All Services</option>
@@ -387,7 +373,7 @@ export default function FindSitterPage() {
               <article
                 key={sitter.sitterId}
                 style={styles.sitterCard}
-                onClick={() => router.push(`/petowner/find-sitter/${sitter.sitterId}?date=${encodeURIComponent(date)}`)}
+                onClick={() => router.push(`/petowner/find-sitter/${sitter.sitterId}`)}
               >
                 <div style={styles.sitterAvatar} />
                 <div>
