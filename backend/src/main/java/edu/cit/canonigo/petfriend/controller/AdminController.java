@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.canonigo.petfriend.model.Booking;
 import edu.cit.canonigo.petfriend.model.BookingStatus;
+import edu.cit.canonigo.petfriend.model.ServiceType;
 import edu.cit.canonigo.petfriend.model.SitterProfile;
 import edu.cit.canonigo.petfriend.model.User;
 import edu.cit.canonigo.petfriend.model.UserRole;
@@ -198,6 +199,56 @@ public class AdminController {
             message = message + " Reason: " + request.getReason().trim();
         }
         return ResponseEntity.ok(new ActionResponse(message));
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> listUsers(@AuthenticationPrincipal UserDetails userDetails) {
+        User admin = getAuthenticatedAdmin(userDetails);
+        if (admin == null) {
+            return forbiddenOrUnauthorized(userDetails);
+        }
+
+        List<AdminUserItem> users = userRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(User::getCreatedAt).reversed())
+                .map(user -> new AdminUserItem(
+                        user.getUserId(),
+                        safeName(user),
+                        user.getEmail(),
+                        user.getRole(),
+                        Boolean.TRUE.equals(user.getIsVerified()),
+                        user.getCreatedAt()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/bookings")
+    public ResponseEntity<?> listBookings(@AuthenticationPrincipal UserDetails userDetails) {
+        User admin = getAuthenticatedAdmin(userDetails);
+        if (admin == null) {
+            return forbiddenOrUnauthorized(userDetails);
+        }
+
+        List<AdminBookingItem> bookings = bookingRepository.findAll()
+                .stream()
+                .sorted(Comparator
+                        .comparing(Booking::getDate, Comparator.nullsLast(Comparator.naturalOrder())).reversed()
+                        .thenComparing(Booking::getStartTime, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(booking -> new AdminBookingItem(
+                        booking.getBookingId(),
+                        booking.getOwner() != null ? safeName(booking.getOwner()) : "Unknown",
+                        booking.getSitter() != null ? safeName(booking.getSitter()) : "Unassigned",
+                        booking.getServiceType(),
+                        booking.getDate(),
+                        booking.getStatus(),
+                        booking.getTotalAmount(),
+                        booking.getCurrency()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(bookings);
     }
 
     private ResponseEntity<String> forbiddenOrUnauthorized(UserDetails userDetails) {
@@ -467,6 +518,114 @@ public class AdminController {
 
         public String getMessage() {
             return message;
+        }
+    }
+
+    public static class AdminUserItem {
+        private final UUID userId;
+        private final String fullName;
+        private final String email;
+        private final UserRole role;
+        private final boolean verified;
+        private final Instant createdAt;
+
+        public AdminUserItem(UUID userId,
+                             String fullName,
+                             String email,
+                             UserRole role,
+                             boolean verified,
+                             Instant createdAt) {
+            this.userId = userId;
+            this.fullName = fullName;
+            this.email = email;
+            this.role = role;
+            this.verified = verified;
+            this.createdAt = createdAt;
+        }
+
+        public UUID getUserId() {
+            return userId;
+        }
+
+        public String getFullName() {
+            return fullName;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public UserRole getRole() {
+            return role;
+        }
+
+        public boolean isVerified() {
+            return verified;
+        }
+
+        public Instant getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminBookingItem {
+        private final UUID bookingId;
+        private final String ownerName;
+        private final String sitterName;
+        private final ServiceType serviceType;
+        private final LocalDate date;
+        private final BookingStatus status;
+        private final BigDecimal totalAmount;
+        private final String currency;
+
+        public AdminBookingItem(UUID bookingId,
+                                String ownerName,
+                                String sitterName,
+                                ServiceType serviceType,
+                                LocalDate date,
+                                BookingStatus status,
+                                BigDecimal totalAmount,
+                                String currency) {
+            this.bookingId = bookingId;
+            this.ownerName = ownerName;
+            this.sitterName = sitterName;
+            this.serviceType = serviceType;
+            this.date = date;
+            this.status = status;
+            this.totalAmount = totalAmount;
+            this.currency = currency;
+        }
+
+        public UUID getBookingId() {
+            return bookingId;
+        }
+
+        public String getOwnerName() {
+            return ownerName;
+        }
+
+        public String getSitterName() {
+            return sitterName;
+        }
+
+        public ServiceType getServiceType() {
+            return serviceType;
+        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+
+        public BookingStatus getStatus() {
+            return status;
+        }
+
+        public BigDecimal getTotalAmount() {
+            return totalAmount;
+        }
+
+        public String getCurrency() {
+            return currency;
         }
     }
 }

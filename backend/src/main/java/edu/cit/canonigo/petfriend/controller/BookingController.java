@@ -244,6 +244,41 @@ public class BookingController {
         return ResponseEntity.ok(responses);
     }
 
+    @PutMapping("/{bookingId}/owner-status")
+    public ResponseEntity<?> updateOwnerBookingStatus(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable UUID bookingId,
+            @Valid @RequestBody UpdateOwnerBookingStatusRequest request
+    ) {
+        User owner = getAuthenticatedUser(userDetails);
+        if (owner == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        if (owner.getRole() != UserRole.PET_OWNER) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null) {
+            return ResponseEntity.status(404).body("Booking not found");
+        }
+
+        if (booking.getOwner() == null || !booking.getOwner().getUserId().equals(owner.getUserId())) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
+        BookingStatus nextStatus = request.getStatus();
+        BookingStatus currentStatus = booking.getStatus();
+
+        if (!isAllowedOwnerTransition(currentStatus, nextStatus)) {
+            return ResponseEntity.badRequest().body("Invalid status transition");
+        }
+
+        booking.setStatus(nextStatus);
+        Booking updated = bookingRepository.save(booking);
+        return ResponseEntity.ok(BookingResponse.from(updated));
+    }
+
     @PutMapping("/{bookingId}/sitter-status")
     public ResponseEntity<?> updateSitterBookingStatus(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -291,6 +326,11 @@ public class BookingController {
             return true;
         }
         return currentStatus == BookingStatus.CONFIRMED && nextStatus == BookingStatus.COMPLETED;
+    }
+
+    private boolean isAllowedOwnerTransition(BookingStatus currentStatus, BookingStatus nextStatus) {
+        return (currentStatus == BookingStatus.PENDING || currentStatus == BookingStatus.CONFIRMED)
+                && nextStatus == BookingStatus.CANCELLED;
     }
 
     public static class CreateBookingRequest {
@@ -372,6 +412,19 @@ public class BookingController {
     }
 
     public static class UpdateSitterBookingStatusRequest {
+        @NotNull
+        private BookingStatus status;
+
+        public BookingStatus getStatus() {
+            return status;
+        }
+
+        public void setStatus(BookingStatus status) {
+            this.status = status;
+        }
+    }
+
+    public static class UpdateOwnerBookingStatusRequest {
         @NotNull
         private BookingStatus status;
 

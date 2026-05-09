@@ -411,6 +411,13 @@ export default function AdminPendingSittersPage() {
     if (key === "pending") {
       return;
     }
+    if (key === "users") {
+      router.push("/admin/users");
+      return;
+    }
+    if (key === "bookings") {
+      router.push("/admin/bookings");
+    }
   };
 
   const handleApprove = async (sitterId) => {

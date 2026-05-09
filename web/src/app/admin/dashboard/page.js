@@ -428,6 +428,14 @@ export default function AdminDashboardPage() {
       router.push("/admin/pending-sitters");
       return;
     }
+    if (key === "users") {
+      router.push("/admin/users");
+      return;
+    }
+    if (key === "bookings") {
+      router.push("/admin/bookings");
+      return;
+    }
     setInfo("This section is planned next. Dashboard data is already live and connected to backend/database.");
   };
 
