@@ -69,7 +69,14 @@ export default function SitterRegisterPage() {
 
       const data = await res.json();
       localStorage.setItem("token", data.token);
-      router.push("/dashboard");
+      localStorage.setItem("user", JSON.stringify({
+        userId: data.userId,
+        role: data.role,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+      }));
+      router.push("/petsitter/dashboard");
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {

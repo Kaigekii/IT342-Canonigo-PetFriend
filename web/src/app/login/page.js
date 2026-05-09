@@ -29,7 +29,22 @@ export default function LoginPage() {
 
       const data = await res.json();
       localStorage.setItem("token", data.token);
-      router.push("/dashboard");
+      localStorage.setItem("user", JSON.stringify({
+        userId: data.userId,
+        role: data.role,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+      }));
+
+      // Redirect based on user role
+      const roleRoutes = {
+        PET_OWNER: "/petowner/dashboard",
+        PET_SITTER: "/petsitter/dashboard",
+        ADMIN: "/admin/dashboard",
+      };
+      const redirectPath = roleRoutes[data.role] || "/dashboard";
+      router.push(redirectPath);
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {

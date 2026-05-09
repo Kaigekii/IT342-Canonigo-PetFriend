@@ -69,7 +69,14 @@ export default function OwnerRegisterPage() {
 
       const data = await res.json();
       localStorage.setItem("token", data.token);
-      router.push("/dashboard");
+      localStorage.setItem("user", JSON.stringify({
+        userId: data.userId,
+        role: data.role,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+      }));
+      router.push("/petowner/dashboard");
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {

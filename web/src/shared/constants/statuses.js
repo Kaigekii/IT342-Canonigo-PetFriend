@@ -1,0 +1,90 @@
+/**
+ * Status Constants for Bookings, Roles, etc.
+ */
+
+export const BOOKING_STATUS = {
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  IN_PROGRESS: "IN_PROGRESS",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED",
+};
+
+export const BOOKING_STATUS_LABELS = {
+  [BOOKING_STATUS.PENDING]: "Pending",
+  [BOOKING_STATUS.CONFIRMED]: "Confirmed",
+  [BOOKING_STATUS.IN_PROGRESS]: "In Progress",
+  [BOOKING_STATUS.COMPLETED]: "Completed",
+  [BOOKING_STATUS.CANCELLED]: "Cancelled",
+};
+
+export const BOOKING_STATUS_COLORS = {
+  [BOOKING_STATUS.PENDING]: "#FFF9C4",     // Warning yellow
+  [BOOKING_STATUS.CONFIRMED]: "#B6E5D8",   // Success green
+  [BOOKING_STATUS.IN_PROGRESS]: "#FFD8B9", // Primary peach
+  [BOOKING_STATUS.COMPLETED]: "#B6E5D8",   // Success green
+  [BOOKING_STATUS.CANCELLED]: "#FFCCBC",   // Error coral
+};
+
+export const USER_ROLE = {
+  PET_OWNER: "PET_OWNER",
+  PET_SITTER: "PET_SITTER",
+  ADMIN: "ADMIN",
+};
+
+export const USER_ROLE_LABELS = {
+  [USER_ROLE.PET_OWNER]: "Pet Owner",
+  [USER_ROLE.PET_SITTER]: "Pet Sitter",
+  [USER_ROLE.ADMIN]: "Administrator",
+};
+
+export const SERVICE_TYPE = {
+  WALKING: "WALKING",
+  SITTING: "SITTING",
+  GROOMING: "GROOMING",
+  TRAINING: "TRAINING",
+  VETERINARY: "VETERINARY",
+};
+
+export const SERVICE_TYPE_LABELS = {
+  [SERVICE_TYPE.WALKING]: "Walking",
+  [SERVICE_TYPE.SITTING]: "Sitting",
+  [SERVICE_TYPE.GROOMING]: "Grooming",
+  [SERVICE_TYPE.TRAINING]: "Training",
+  [SERVICE_TYPE.VETERINARY]: "Veterinary Assistance",
+};
+
+export const PET_SPECIES = {
+  DOG: "DOG",
+  CAT: "CAT",
+  RABBIT: "RABBIT",
+  HAMSTER: "HAMSTER",
+  BIRD: "BIRD",
+  OTHER: "OTHER",
+};
+
+export const PET_SPECIES_LABELS = {
+  [PET_SPECIES.DOG]: "Dog",
+  [PET_SPECIES.CAT]: "Cat",
+  [PET_SPECIES.RABBIT]: "Rabbit",
+  [PET_SPECIES.HAMSTER]: "Hamster",
+  [PET_SPECIES.BIRD]: "Bird",
+  [PET_SPECIES.OTHER]: "Other",
+};
+
+export const RATING_MIN = 1;
+export const RATING_MAX = 5;
+
+export default {
+  BOOKING_STATUS,
+  BOOKING_STATUS_LABELS,
+  BOOKING_STATUS_COLORS,
+  USER_ROLE,
+  USER_ROLE_LABELS,
+  SERVICE_TYPE,
+  SERVICE_TYPE_LABELS,
+  PET_SPECIES,
+  PET_SPECIES_LABELS,
+  RATING_MIN,
+  RATING_MAX,
+};
