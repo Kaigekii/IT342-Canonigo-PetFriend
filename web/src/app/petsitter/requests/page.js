@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+const STATUS_TABS = [
+  { key: "ALL", label: "All" },
+  { key: "PENDING", label: "Pending" },
+  { key: "CONFIRMED", label: "Confirmed" },
+  { key: "COMPLETED", label: "Completed" },
+];
+
 const styles = {
   page: {
     minHeight: "100vh",
@@ -113,135 +120,134 @@ const styles = {
     padding: "28px 24px 36px",
   },
   title: {
-    fontSize: 38,
+    fontSize: 28,
     lineHeight: 1.1,
     fontWeight: 800,
-    marginBottom: 10,
+    marginBottom: 16,
   },
-  helperRow: {
+  tabs: {
     display: "flex",
     alignItems: "center",
     gap: 10,
-    marginBottom: 18,
+    marginBottom: 20,
     flexWrap: "wrap",
   },
-  verifiedBadge: {
-    border: "1px solid #D3D3D3",
-    borderRadius: 6,
-    backgroundColor: "#FFF8F0",
-    fontSize: 12,
-    fontWeight: 700,
-    letterSpacing: "0.06em",
-    padding: "4px 10px",
-    textTransform: "uppercase",
-  },
-  ratingText: {
-    fontSize: 14,
-    color: "#777777",
-    fontWeight: 600,
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: 14,
-    marginBottom: 24,
-  },
-  statCard: {
-    border: "1px solid #D3D3D3",
-    borderRadius: 8,
-    backgroundColor: "#FFF8F0",
-    boxShadow: "0px 2px 6px rgba(0,0,0,0.05)",
-    minHeight: 90,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
-  },
-  statValue: {
-    fontSize: 40,
-    fontWeight: 800,
-    lineHeight: 1,
-    marginBottom: 8,
-  },
-  statLabel: {
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: "0.08em",
-    color: "#777777",
-    fontWeight: 700,
-  },
-  sectionTitle: {
-    fontSize: 27,
-    fontWeight: 800,
-    textTransform: "uppercase",
-    letterSpacing: "0.02em",
-    marginBottom: 10,
-  },
-  list: {
-    display: "grid",
-    gap: 12,
-    marginBottom: 24,
-  },
-  rowCard: {
-    border: "1px solid #D3D3D3",
-    borderRadius: 8,
-    backgroundColor: "#FFF8F0",
-    boxShadow: "0px 2px 6px rgba(0,0,0,0.05)",
-    padding: 12,
-    display: "grid",
-    gridTemplateColumns: "44px 1fr auto",
-    alignItems: "center",
-    gap: 10,
-  },
-  rowAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: "50%",
-    backgroundColor: "#FFB6C1",
-  },
-  rowName: {
-    fontSize: 22,
-    lineHeight: 1,
-    fontWeight: 700,
-    marginBottom: 6,
-  },
-  rowMeta: {
-    fontSize: 14,
-    color: "#777777",
-    fontWeight: 600,
-  },
-  rowActions: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-  },
-  amount: {
-    fontSize: 28,
-    fontWeight: 800,
-    lineHeight: 1,
-    marginRight: 4,
-  },
-  buttonDark: {
-    height: 32,
-    borderRadius: 8,
-    border: "none",
-    backgroundColor: "#1E1E1E",
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: 800,
-    padding: "0 12px",
-    cursor: "pointer",
-  },
-  buttonLight: {
-    height: 32,
+  tabButton: {
+    height: 34,
     borderRadius: 8,
     border: "1px solid #D3D3D3",
     backgroundColor: "#FFF8F0",
     color: "#333333",
     fontSize: 12,
     fontWeight: 700,
-    padding: "0 12px",
+    letterSpacing: "0.06em",
+    textTransform: "uppercase",
+    padding: "0 14px",
+    cursor: "pointer",
+  },
+  tabButtonActive: {
+    height: 34,
+    borderRadius: 8,
+    border: "1px solid #1E1E1E",
+    backgroundColor: "#1E1E1E",
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: "0.06em",
+    textTransform: "uppercase",
+    padding: "0 14px",
+    cursor: "pointer",
+  },
+  list: {
+    display: "grid",
+    gap: 16,
+  },
+  rowCard: {
+    border: "1px solid #D3D3D3",
+    borderRadius: 10,
+    backgroundColor: "#FFF8F0",
+    boxShadow: "0px 2px 6px rgba(0,0,0,0.05)",
+    padding: 16,
+    display: "grid",
+    gridTemplateColumns: "48px 1fr auto",
+    alignItems: "center",
+    gap: 12,
+  },
+  rowAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: "50%",
+    backgroundColor: "#D3D3D3",
+  },
+  rowName: {
+    fontSize: 18,
+    lineHeight: 1.1,
+    fontWeight: 700,
+    marginBottom: 6,
+  },
+  rowMeta: {
+    fontSize: 13,
+    color: "#777777",
+    fontWeight: 600,
+  },
+  rowMetaSecondary: {
+    fontSize: 12,
+    color: "#999999",
+    marginTop: 4,
+  },
+  rowActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
+  },
+  amount: {
+    fontSize: 18,
+    fontWeight: 800,
+    lineHeight: 1,
+  },
+  statusBadge: {
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    padding: "6px 10px",
+    borderRadius: 999,
+    border: "1px solid #D3D3D3",
+  },
+  statusPending: {
+    backgroundColor: "#FFF9C4",
+    borderColor: "#FFF9C4",
+  },
+  statusConfirmed: {
+    backgroundColor: "#B6E5D8",
+    borderColor: "#B6E5D8",
+  },
+  statusCompleted: {
+    backgroundColor: "#D3D3D3",
+    borderColor: "#D3D3D3",
+  },
+  buttonDark: {
+    height: 34,
+    borderRadius: 8,
+    border: "none",
+    backgroundColor: "#1E1E1E",
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: 800,
+    padding: "0 14px",
+    cursor: "pointer",
+  },
+  buttonLight: {
+    height: 34,
+    borderRadius: 8,
+    border: "1px solid #D3D3D3",
+    backgroundColor: "#FFF8F0",
+    color: "#333333",
+    fontSize: 12,
+    fontWeight: 700,
+    padding: "0 14px",
     cursor: "pointer",
   },
   emptyBox: {
@@ -296,7 +302,19 @@ function formatMoney(amount, currency) {
   return `P${num.toFixed(2)}`;
 }
 
-export default function PetSitterDashboardPage() {
+function getStatusLabel(status) {
+  if (!status) return "UNKNOWN";
+  return String(status).toUpperCase();
+}
+
+function getStatusStyle(status) {
+  if (status === "PENDING") return { ...styles.statusBadge, ...styles.statusPending };
+  if (status === "CONFIRMED") return { ...styles.statusBadge, ...styles.statusConfirmed };
+  if (status === "COMPLETED") return { ...styles.statusBadge, ...styles.statusCompleted };
+  return styles.statusBadge;
+}
+
+export default function PetSitterRequestsPage() {
   const router = useRouter();
   const menuRef = useRef(null);
 
@@ -306,16 +324,12 @@ export default function PetSitterDashboardPage() {
   }, []);
 
   const [user, setUser] = useState(null);
-  const [pendingRequests, setPendingRequests] = useState([]);
-  const [upcomingSessions, setUpcomingSessions] = useState([]);
-  const [todaySchedule, setTodaySchedule] = useState([]);
-  const [allBookings, setAllBookings] = useState([]);
-  const [reviewSummary, setReviewSummary] = useState({ averageRating: 0, reviewCount: 0 });
-
+  const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [activeTab, setActiveTab] = useState("ALL");
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const loadData = useCallback(async (authToken) => {
@@ -337,34 +351,11 @@ export default function PetSitterDashboardPage() {
 
     setUser(me);
 
-    const [pendingRes, upcomingRes, todayRes, allRes, reviewSummaryRes] = await Promise.all([
-      fetch(`${API_BASE}/api/bookings/sitter/pending`, { headers }),
-      fetch(`${API_BASE}/api/bookings/sitter/upcoming`, { headers }),
-      fetch(`${API_BASE}/api/bookings/sitter/today`, { headers }),
-      fetch(`${API_BASE}/api/bookings/sitter`, { headers }),
-      fetch(`${API_BASE}/api/reviews/sitter/${me.userId}/summary`, { headers }),
-    ]);
+    const bookingsRes = await fetch(`${API_BASE}/api/bookings/sitter`, { headers });
+    if (!bookingsRes.ok) throw new Error("Failed to load sitter bookings");
 
-    if (!pendingRes.ok || !upcomingRes.ok || !todayRes.ok || !allRes.ok || !reviewSummaryRes.ok) {
-      throw new Error("Failed to load sitter bookings");
-    }
-
-    const [pendingData, upcomingData, todayData, allData, reviewSummaryData] = await Promise.all([
-      pendingRes.json(),
-      upcomingRes.json(),
-      todayRes.json(),
-      allRes.json(),
-      reviewSummaryRes.json(),
-    ]);
-
-    setPendingRequests(Array.isArray(pendingData) ? pendingData : []);
-    setUpcomingSessions(Array.isArray(upcomingData) ? upcomingData : []);
-    setTodaySchedule(Array.isArray(todayData) ? todayData : []);
-    setAllBookings(Array.isArray(allData) ? allData : []);
-    setReviewSummary({
-      averageRating: Number(reviewSummaryData?.averageRating ?? 0),
-      reviewCount: Number(reviewSummaryData?.reviewCount ?? 0),
-    });
+    const bookingsData = await bookingsRes.json();
+    setRequests(Array.isArray(bookingsData) ? bookingsData : []);
   }, [router]);
 
   useEffect(() => {
@@ -441,19 +432,24 @@ export default function PetSitterDashboardPage() {
     }
   };
 
-  const completedCount = allBookings.filter((b) => b.status === "COMPLETED").length;
-  const totalEarned = allBookings
-    .filter((b) => b.status === "COMPLETED")
-    .reduce((sum, b) => sum + (Number(b.totalAmount) || 0), 0);
+  const filteredRequests = useMemo(() => {
+    if (activeTab === "ALL") return requests;
+    return requests.filter((request) => request.status === activeTab);
+  }, [requests, activeTab]);
+
+  const getTabCount = useCallback((key) => {
+    if (key === "ALL") return requests.length;
+    return requests.filter((request) => request.status === key).length;
+  }, [requests]);
 
   return (
     <div style={styles.page}>
       <header style={styles.topBar}>
         <div style={styles.brand}>PetFriend</div>
         <nav style={styles.nav} aria-label="Primary">
-          <span style={styles.navItemActive}>Dashboard</span>
+          <span style={styles.navItem} onClick={() => router.push("/petsitter/dashboard")}>Dashboard</span>
           <span style={styles.navItem} onClick={() => router.push("/petsitter/profile")}>My Profile</span>
-          <span style={styles.navItem} onClick={() => router.push("/petsitter/requests")}>Requests</span>
+          <span style={styles.navItemActive}>Requests</span>
           <span style={styles.navItem} onClick={() => router.push("/petsitter/messages")}>Messages</span>
         </nav>
 
@@ -476,93 +472,65 @@ export default function PetSitterDashboardPage() {
       </header>
 
       <main style={styles.content}>
-        <h1 style={styles.title}>Welcome, {user?.firstName || "Pet Sitter"}</h1>
-        <div style={styles.helperRow}>
-          <span style={styles.verifiedBadge}>{user?.isVerified ? "Verified" : "Pending Verification"}</span>
-          <span style={styles.ratingText}>⭐ {reviewSummary.averageRating.toFixed(1)} ({reviewSummary.reviewCount} reviews)</span>
-        </div>
+        <h1 style={styles.title}>Booking Requests</h1>
 
         {error && <div style={styles.errorBox}>{error}</div>}
         {success && <div style={styles.successBox}>{success}</div>}
 
-        <section style={styles.statsGrid} aria-label="Sitter metrics">
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{pendingRequests.length}</div>
-            <div style={styles.statLabel}>Pending Requests</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{upcomingSessions.length}</div>
-            <div style={styles.statLabel}>Upcoming Sessions</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{completedCount}</div>
-            <div style={styles.statLabel}>Completed</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{formatMoney(totalEarned, "PHP")}</div>
-            <div style={styles.statLabel}>Total Earned</div>
-          </div>
-        </section>
+        <div style={styles.tabs} role="tablist" aria-label="Request status">
+          {STATUS_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              style={activeTab === tab.key ? styles.tabButtonActive : styles.tabButton}
+              onClick={() => setActiveTab(tab.key)}
+              role="tab"
+              aria-selected={activeTab === tab.key}
+            >
+              {tab.label} ({getTabCount(tab.key)})
+            </button>
+          ))}
+        </div>
 
-        <section aria-label="Pending Requests">
-          <h2 style={styles.sectionTitle}>Pending Requests</h2>
-          <div style={styles.list}>
-            {loading ? (
-              <div style={styles.emptyBox}>Loading requests...</div>
-            ) : pendingRequests.length === 0 ? (
-              <div style={styles.emptyBox}>No pending requests.</div>
-            ) : (
-              pendingRequests.map((request) => (
-                <div key={request.bookingId} style={styles.rowCard}>
-                  <div style={styles.rowAvatar} />
-                  <div>
-                    <div style={styles.rowName}>{request.ownerName || "Pet Owner"}</div>
-                    <div style={styles.rowMeta}>
-                      {(request.petNames?.[0] || "Pet")} . {String(request.serviceType || "SERVICE").toLowerCase()} . {formatDate(request.date)} . {formatTime(request.startTime)}-{formatTime(request.endTime)}
-                    </div>
+        <div style={styles.list}>
+          {loading ? (
+            <div style={styles.emptyBox}>Loading requests...</div>
+          ) : filteredRequests.length === 0 ? (
+            <div style={styles.emptyBox}>No requests to show.</div>
+          ) : (
+            filteredRequests.map((request) => (
+              <div key={request.bookingId} style={styles.rowCard}>
+                <div style={styles.rowAvatar} />
+                <div>
+                  <div style={styles.rowName}>{request.ownerName || "Pet Owner"}</div>
+                  <div style={styles.rowMeta}>
+                    {(request.petNames?.[0] || "Pet")} . {String(request.serviceType || "SERVICE").toLowerCase()} . {formatDate(request.date)} . {formatTime(request.startTime)}-{formatTime(request.endTime)}
                   </div>
-                  <div style={styles.rowActions}>
-                    <span style={styles.amount}>{formatMoney(request.totalAmount, request.currency)}</span>
-                    <button type="button" style={styles.buttonDark} onClick={() => updateStatus(request.bookingId, "CONFIRMED")} disabled={saving}>
-                      Accept
-                    </button>
-                    <button type="button" style={styles.buttonLight} onClick={() => updateStatus(request.bookingId, "CANCELLED")} disabled={saving}>
-                      Decline
-                    </button>
-                  </div>
+                  <div style={styles.rowMetaSecondary}>{request.bookingId || ""}</div>
                 </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        <section aria-label="Today's Schedule">
-          <h2 style={styles.sectionTitle}>Today&apos;s Schedule</h2>
-          <div style={styles.list}>
-            {loading ? (
-              <div style={styles.emptyBox}>Loading schedule...</div>
-            ) : todaySchedule.length === 0 ? (
-              <div style={styles.emptyBox}>No sessions for today.</div>
-            ) : (
-              todaySchedule.map((session) => (
-                <div key={session.bookingId} style={styles.rowCard}>
-                  <div style={styles.rowAvatar} />
-                  <div>
-                    <div style={styles.rowName}>{session.ownerName || "Pet Owner"} - {session.petNames?.[0] || "Pet"}</div>
-                    <div style={styles.rowMeta}>
-                      {String(session.serviceType || "SERVICE").toLowerCase()} . {formatTime(session.startTime)}-{formatTime(session.endTime)}
-                    </div>
-                  </div>
-                  <div style={styles.rowActions}>
-                    <button type="button" style={styles.buttonDark} onClick={() => updateStatus(session.bookingId, "COMPLETED")} disabled={saving}>
-                      Mark Complete
+                <div style={styles.rowActions}>
+                  <span style={styles.amount}>{formatMoney(request.totalAmount, request.currency)}</span>
+                  <span style={getStatusStyle(request.status)}>{getStatusLabel(request.status)}</span>
+                  {request.status === "PENDING" && (
+                    <>
+                      <button type="button" style={styles.buttonDark} onClick={() => updateStatus(request.bookingId, "CONFIRMED")} disabled={saving}>
+                        Accept
+                      </button>
+                      <button type="button" style={styles.buttonLight} onClick={() => updateStatus(request.bookingId, "CANCELLED")} disabled={saving}>
+                        Decline
+                      </button>
+                    </>
+                  )}
+                  {request.status === "CONFIRMED" && (
+                    <button type="button" style={styles.buttonDark} onClick={() => updateStatus(request.bookingId, "COMPLETED")} disabled={saving}>
+                      Complete
                     </button>
-                  </div>
+                  )}
                 </div>
-              ))
-            )}
-          </div>
-        </section>
+              </div>
+            ))
+          )}
+        </div>
       </main>
     </div>
   );

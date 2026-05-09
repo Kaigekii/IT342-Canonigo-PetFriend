@@ -37,4 +37,6 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findTop5ByOrderByCreatedAtDesc();
 
     List<Booking> findAllByDateBetween(LocalDate startDate, LocalDate endDate);
+
+    boolean existsByOwner_UserIdAndSitter_UserId(UUID ownerId, UUID sitterId);
 }

@@ -532,8 +532,8 @@ export default function PetSitterProfilePage() {
         <nav style={styles.nav} aria-label="Primary">
           <span style={styles.navItem} onClick={() => router.push("/petsitter/dashboard")}>Dashboard</span>
           <span style={styles.navItemActive}>My Profile</span>
-          <span style={styles.navItem}>Requests</span>
-          <span style={styles.navItem}>Messages</span>
+          <span style={styles.navItem} onClick={() => router.push("/petsitter/requests")}>Requests</span>
+          <span style={styles.navItem} onClick={() => router.push("/petsitter/messages")}>Messages</span>
         </nav>
 
         <div style={styles.topRightWrap} ref={menuRef}>

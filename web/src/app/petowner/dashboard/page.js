@@ -510,8 +510,8 @@ export default function PetOwnerDashboardPage() {
           <span style={styles.navItemActive}>Dashboard</span>
           <span style={styles.navItem} onClick={() => router.push("/petowner/pets")}>My Pets</span>
           <span style={styles.navItem} onClick={() => router.push("/petowner/find-sitter")}>Find Sitters</span>
-          <span style={styles.navItem}>Bookings</span>
-          <span style={styles.navItem}>Messages</span>
+          <span style={styles.navItem} onClick={() => router.push("/petowner/bookings")}>Bookings</span>
+          <span style={styles.navItem} onClick={() => router.push("/petowner/messages")}>Messages</span>
         </nav>
 
         <div style={styles.topRightWrap} ref={menuRef}>
