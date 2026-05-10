@@ -205,7 +205,7 @@ export default function FindSitterPage() {
     return localStorage.getItem("token");
   }, []);
 
-  const [location, setLocation] = useState("Cebu City");
+  const [location, setLocation] = useState("");
   const [serviceType, setServiceType] = useState("ALL");
   const [sitters, setSitters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -254,10 +254,11 @@ export default function FindSitterPage() {
       if (!ok) return;
 
       const params = new URLSearchParams();
-      params.set("location", location);
-      params.set("serviceType", serviceType);
+      if (location && location.trim() !== "") params.set("location", location.trim());
+      if (serviceType && serviceType !== "ALL") params.set("serviceType", serviceType);
 
-      const res = await fetch(`${API_BASE}/api/sitters/search?${params.toString()}`, {
+      const query = params.toString() ? `?${params.toString()}` : "";
+      const res = await fetch(`${API_BASE}/api/sitters/search${query}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

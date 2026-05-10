@@ -64,14 +64,14 @@ public class SitterDtos {
         private final String experience;
         private final BigDecimal hourlyRate;
         private final List<String> servicesOffered;
+        private final String location;
         private final Map<String, DayAvailability> availabilitySchedule;
         private final BigDecimal rating;
         private final long reviewCount;
         private final boolean verified;
         private final List<ReviewItem> reviews;
-
         public SitterDetailResponse(UUID sitterId, String fullName, String bio, String experience,
-                                    BigDecimal hourlyRate, List<String> servicesOffered,
+                                    BigDecimal hourlyRate, List<String> servicesOffered, String location,
                                     Map<String, DayAvailability> availabilitySchedule,
                                     BigDecimal rating, long reviewCount, boolean verified,
                                     List<ReviewItem> reviews) {
@@ -81,6 +81,7 @@ public class SitterDtos {
             this.experience = experience;
             this.hourlyRate = hourlyRate;
             this.servicesOffered = servicesOffered;
+            this.location = location;
             this.availabilitySchedule = availabilitySchedule;
             this.rating = rating;
             this.reviewCount = reviewCount;
@@ -99,6 +100,7 @@ public class SitterDtos {
         public long getReviewCount() { return reviewCount; }
         public boolean isVerified() { return verified; }
         public List<ReviewItem> getReviews() { return reviews; }
+        public String getLocation() { return location; }
     }
 
     /**
@@ -114,6 +116,7 @@ public class SitterDtos {
         private String studentId;
         private String referenceContact;
         private String verificationDocumentUrl;
+        private String location;
 
         public String getProfilePhotoUrl() { return profilePhotoUrl; }
         public void setProfilePhotoUrl(String profilePhotoUrl) { this.profilePhotoUrl = profilePhotoUrl; }
@@ -145,6 +148,8 @@ public class SitterDtos {
         public void setVerificationDocumentUrl(String verificationDocumentUrl) { 
             this.verificationDocumentUrl = verificationDocumentUrl; 
         }
+        public String getLocation() { return location; }
+        public void setLocation(String location) { this.location = location; }
     }
 
     /**
@@ -159,6 +164,7 @@ public class SitterDtos {
         public BigDecimal hourlyRate;
         public List<String> servicesOffered;
         public Map<String, DayAvailability> availabilitySchedule;
+        public String location;
         public String studentId;
         public String referenceContact;
         public String verificationDocumentUrl;

@@ -338,6 +338,7 @@ export default function PetSitterProfilePage() {
   const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
   const [bio, setBio] = useState("");
   const [experience, setExperience] = useState("");
+  const [location, setLocation] = useState("");
   const [hourlyRate, setHourlyRate] = useState("");
   const [servicesOffered, setServicesOffered] = useState(["walk", "feeding", "overnight"]);
   const [availabilitySchedule, setAvailabilitySchedule] = useState(emptySchedule());
@@ -377,6 +378,7 @@ export default function PetSitterProfilePage() {
     setProfilePhotoUrl(data.profilePhotoUrl || "");
     setBio(data.bio || "");
     setExperience(data.experience || "");
+    setLocation(data.location || me.address || "");
     setHourlyRate(data.hourlyRate !== null && data.hourlyRate !== undefined ? String(data.hourlyRate) : "");
     setServicesOffered(Array.isArray(data.servicesOffered) ? data.servicesOffered : []);
     setAvailabilitySchedule({ ...emptySchedule(), ...(data.availabilitySchedule || {}) });
@@ -475,6 +477,7 @@ export default function PetSitterProfilePage() {
           hourlyRate: hourlyRate ? Number(hourlyRate) : null,
           servicesOffered,
           availabilitySchedule,
+          location: location.trim() || null,
           studentId: studentId.trim() || null,
           referenceContact: referenceContact.trim() || null,
           verificationDocumentUrl: verificationDocumentUrl.trim() || null,
@@ -588,6 +591,10 @@ export default function PetSitterProfilePage() {
               <div style={styles.fieldLabel}>Hourly Rate (PHP)</div>
               <input style={styles.input} type="number" min="0" step="0.01" value={hourlyRate} onChange={(e) => setHourlyRate(e.target.value)} disabled={saving} placeholder="150.00" />
             </div>
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <div style={styles.fieldLabel}>Location</div>
+            <input style={styles.input} value={location} onChange={(e) => setLocation(e.target.value)} disabled={saving} placeholder="City or neighborhood" />
           </div>
         </section>
 

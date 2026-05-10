@@ -1,6 +1,8 @@
 package edu.cit.canonigo.petfriend.repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,4 +41,12 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findAllByDateBetween(LocalDate startDate, LocalDate endDate);
 
     boolean existsByOwner_UserIdAndSitter_UserId(UUID ownerId, UUID sitterId);
+
+    boolean existsBySitter_UserIdAndDateAndStatusInAndStartTimeLessThanAndEndTimeGreaterThan(
+            UUID sitterId,
+            LocalDate date,
+            Collection<BookingStatus> statuses,
+            LocalTime endTime,
+            LocalTime startTime
+    );
 }

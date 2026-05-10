@@ -64,6 +64,14 @@ public class SitterService {
                 continue;
             }
 
+            String sitterLocation = sitter.getAddress() == null ? "" : sitter.getAddress();
+            if (location != null && !location.isBlank()) {
+                String filter = location.trim().toLowerCase(Locale.ROOT);
+                if (!sitterLocation.toLowerCase(Locale.ROOT).contains(filter)) {
+                    continue;
+                }
+            }
+
             SitterDtos.RatingInfo ratingInfo = buildRatingInfo(sitter.getUserId());
             results.add(new SitterDtos.SitterSummaryResponse(
                     sitter.getUserId(),
@@ -75,7 +83,7 @@ public class SitterService {
                     ratingInfo.getRating(),
                     ratingInfo.getReviewCount(),
                     true,
-                    location == null ? "" : location
+                    sitterLocation
             ));
         }
 
@@ -108,7 +116,8 @@ public class SitterService {
                 profile.getExperience(),
                 profile.getHourlyRate(),
                 services,
-                schedule,
+            sitter.getAddress() == null ? "" : sitter.getAddress(),
+            schedule,
                 ratingInfo.getRating(),
                 ratingInfo.getReviewCount(),
                 true,
@@ -148,6 +157,10 @@ public class SitterService {
         ));
 
         sitter.setProfilePhotoUrl(request.getProfilePhotoUrl());
+        // allow sitter to update their address/location via profile
+        if (request.getLocation() != null) {
+            sitter.setAddress(request.getLocation());
+        }
         userRepository.save(sitter);
 
         SitterProfile saved = sitterProfileRepository.save(profile);
@@ -189,6 +202,7 @@ public class SitterService {
 
         response.servicesOffered = parseServices(profile.getServicesJson());
         response.availabilitySchedule = parseSchedule(profile.getAvailabilityJson());
+        response.location = sitter.getAddress();
 
         return response;
     }

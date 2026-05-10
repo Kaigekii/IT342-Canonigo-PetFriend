@@ -580,6 +580,7 @@ export default function SitterDetailPage() {
               <div>
                 <h1 style={styles.sitterName}>{sitter.fullName}</h1>
                 <p style={styles.sitterBio}>{sitter.bio || "Loves dogs and cats."}</p>
+                <div style={{ fontSize: 14, color: "#666666", marginBottom: 8 }}>{sitter.location || "N/A"}</div>
                 <div style={styles.ratingRow}>
                   <span style={styles.ratingText}>⭐ {sitter.rating} ({sitter.reviewCount} reviews)</span>
                   {sitter.verified ? <span style={styles.verifiedBadge}>✓ Verified</span> : null}

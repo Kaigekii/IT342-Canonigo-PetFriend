@@ -2,6 +2,7 @@ package edu.cit.canonigo.petfriend.features.bookings;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.EnumSet;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -134,6 +135,18 @@ public class BookingService {
         // Validate times
         if (request.getStartTime().compareTo(request.getEndTime()) >= 0) {
             throw new BookingException("End time must be after start time");
+        }
+
+        // Prevent double booking for the same sitter/date and overlapping time window.
+        boolean hasConflict = bookingRepository.existsBySitter_UserIdAndDateAndStatusInAndStartTimeLessThanAndEndTimeGreaterThan(
+                sitter.getUserId(),
+                request.getDate(),
+                EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED),
+                request.getEndTime(),
+                request.getStartTime()
+        );
+        if (hasConflict) {
+            throw new BookingException("Failed to book: sitter is already booked for this time slot");
         }
 
         // Fetch sitter profile and validate hourly rate
