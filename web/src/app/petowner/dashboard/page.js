@@ -530,7 +530,7 @@ export default function PetOwnerDashboardPage() {
                 style={styles.menuItem}
                 onClick={() => {
                   setShowProfileMenu(false);
-                  router.push("/dashboard");
+                  router.push("/petowner/profile");
                 }}
               >
                 Profile

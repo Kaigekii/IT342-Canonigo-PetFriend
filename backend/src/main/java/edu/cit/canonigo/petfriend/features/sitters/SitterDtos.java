@@ -1,7 +1,5 @@
 package edu.cit.canonigo.petfriend.features.sitters;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;

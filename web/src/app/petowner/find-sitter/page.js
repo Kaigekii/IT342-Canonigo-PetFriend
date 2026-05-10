@@ -323,7 +323,7 @@ export default function FindSitterPage() {
 
           {showProfileMenu && (
             <div style={styles.profileMenu}>
-              <button type="button" style={styles.menuItem} onClick={() => router.push("/dashboard")}>Profile</button>
+              <button type="button" style={styles.menuItem} onClick={() => router.push("/petowner/profile")}>Profile</button>
               <button type="button" style={styles.menuItemDanger} onClick={handleLogout}>Logout</button>
             </div>
           )}

@@ -214,7 +214,7 @@ public class SitterService {
                     new TypeReference<List<String>>() {}
             );
             return parsed.stream().filter(s -> s != null && !s.isBlank()).map(String::trim).toList();
-        } catch (Exception ex) {
+        } catch (JsonProcessingException ex) {
             return List.of();
         }
     }
@@ -225,7 +225,7 @@ public class SitterService {
                     scheduleJson == null || scheduleJson.isBlank() ? "{}" : scheduleJson,
                     new TypeReference<Map<String, SitterDtos.DayAvailability>>() {}
             );
-        } catch (Exception ex) {
+        } catch (JsonProcessingException ex) {
             return Map.of();
         }
     }

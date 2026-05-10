@@ -1,12 +1,13 @@
 package edu.cit.canonigo.petfriend.features.auth;
 
+import java.util.UUID;
+
 import edu.cit.canonigo.petfriend.model.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.util.UUID;
 
 /**
  * DTOs for authentication operations (login, register).
@@ -220,6 +221,81 @@ public class AuthDtos {
 
         public void setIsVerified(Boolean isVerified) {
             this.isVerified = isVerified;
+        }
+    }
+
+    public static class UpdateProfileRequest {
+        private String firstName;
+        private String lastName;
+        private String phoneNumber;
+        private String address;
+        private String profilePhotoUrl;
+        private String currentPassword;
+        private String newPassword;
+        private String confirmNewPassword;
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
+
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+
+        public void setPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public String getProfilePhotoUrl() {
+            return profilePhotoUrl;
+        }
+
+        public void setProfilePhotoUrl(String profilePhotoUrl) {
+            this.profilePhotoUrl = profilePhotoUrl;
+        }
+
+        public String getCurrentPassword() {
+            return currentPassword;
+        }
+
+        public void setCurrentPassword(String currentPassword) {
+            this.currentPassword = currentPassword;
+        }
+
+        public String getNewPassword() {
+            return newPassword;
+        }
+
+        public void setNewPassword(String newPassword) {
+            this.newPassword = newPassword;
+        }
+
+        public String getConfirmNewPassword() {
+            return confirmNewPassword;
+        }
+
+        public void setConfirmNewPassword(String confirmNewPassword) {
+            this.confirmNewPassword = confirmNewPassword;
         }
     }
 }
