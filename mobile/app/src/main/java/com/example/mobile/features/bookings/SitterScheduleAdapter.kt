@@ -9,26 +9,25 @@ import com.example.mobile.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class BookingAdapter(private var bookings: List<Booking>) : RecyclerView.Adapter<BookingAdapter.BookingViewHolder>() {
+class SitterScheduleAdapter(private var bookings: List<Booking>) : RecyclerView.Adapter<SitterScheduleAdapter.ScheduleViewHolder>() {
 
-    class BookingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvBookingService: TextView = view.findViewById(R.id.tvBookingService)
-        val tvBookingStatus: TextView = view.findViewById(R.id.tvBookingStatus)
-        val tvBookingDate: TextView = view.findViewById(R.id.tvBookingDate)
-        val tvBookingSitter: TextView = view.findViewById(R.id.tvBookingSitter)
+    class ScheduleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvOwner: TextView = view.findViewById(R.id.tvScheduleOwner)
+        val tvService: TextView = view.findViewById(R.id.tvScheduleService)
+        val tvDate: TextView = view.findViewById(R.id.tvScheduleDate)
+        val tvAmount: TextView = view.findViewById(R.id.tvScheduleAmount)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookingViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_booking_card, parent, false)
-        return BookingViewHolder(view)
+            .inflate(R.layout.item_sitter_schedule_card, parent, false)
+        return ScheduleViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: BookingViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ScheduleViewHolder, position: Int) {
         val booking = bookings[position]
-        holder.tvBookingService.text = booking.serviceType
-        holder.tvBookingStatus.text = booking.status
-        holder.tvBookingSitter.text = "Sitter: ${booking.sitterName ?: "TBD"}"
+        holder.tvOwner.text = booking.ownerName
+        holder.tvService.text = booking.serviceType
 
         val dateLabel = try {
             val dateParser = SimpleDateFormat("yyyy-MM-dd", Locale.US)
@@ -49,11 +48,13 @@ class BookingAdapter(private var bookings: List<Booking>) : RecyclerView.Adapter
             "${booking.date} • ${booking.startTime} - ${booking.endTime}"
         }
 
-        holder.tvBookingDate.text = dateLabel
+        holder.tvDate.text = dateLabel
+        val amount = booking.totalAmount?.let { "PHP ${String.format("%.2f", it)}" } ?: "PHP 0.00"
+        holder.tvAmount.text = amount
     }
 
     override fun getItemCount() = bookings.size
-    
+
     fun updateData(newBookings: List<Booking>) {
         bookings = newBookings
         notifyDataSetChanged()

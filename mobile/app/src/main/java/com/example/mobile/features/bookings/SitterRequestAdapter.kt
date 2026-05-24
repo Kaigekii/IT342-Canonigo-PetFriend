@@ -6,29 +6,36 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobile.R
+import com.google.android.material.button.MaterialButton
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class BookingAdapter(private var bookings: List<Booking>) : RecyclerView.Adapter<BookingAdapter.BookingViewHolder>() {
+class SitterRequestAdapter(
+    private var bookings: List<Booking>,
+    private val onAccept: (Booking) -> Unit,
+    private val onDecline: (Booking) -> Unit
+) : RecyclerView.Adapter<SitterRequestAdapter.RequestViewHolder>() {
 
-    class BookingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvBookingService: TextView = view.findViewById(R.id.tvBookingService)
-        val tvBookingStatus: TextView = view.findViewById(R.id.tvBookingStatus)
-        val tvBookingDate: TextView = view.findViewById(R.id.tvBookingDate)
-        val tvBookingSitter: TextView = view.findViewById(R.id.tvBookingSitter)
+    class RequestViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvOwner: TextView = view.findViewById(R.id.tvRequestOwner)
+        val tvService: TextView = view.findViewById(R.id.tvRequestService)
+        val tvDate: TextView = view.findViewById(R.id.tvRequestDate)
+        val tvPets: TextView = view.findViewById(R.id.tvRequestPets)
+        val btnAccept: MaterialButton = view.findViewById(R.id.btnAcceptRequest)
+        val btnDecline: MaterialButton = view.findViewById(R.id.btnDeclineRequest)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookingViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RequestViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_booking_card, parent, false)
-        return BookingViewHolder(view)
+            .inflate(R.layout.item_sitter_request_card, parent, false)
+        return RequestViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: BookingViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RequestViewHolder, position: Int) {
         val booking = bookings[position]
-        holder.tvBookingService.text = booking.serviceType
-        holder.tvBookingStatus.text = booking.status
-        holder.tvBookingSitter.text = "Sitter: ${booking.sitterName ?: "TBD"}"
+        holder.tvOwner.text = booking.ownerName
+        holder.tvService.text = booking.serviceType
+        holder.tvPets.text = if (booking.petNames.isEmpty()) "Pets: -" else "Pets: ${booking.petNames.joinToString(", ")}" 
 
         val dateLabel = try {
             val dateParser = SimpleDateFormat("yyyy-MM-dd", Locale.US)
@@ -49,11 +56,14 @@ class BookingAdapter(private var bookings: List<Booking>) : RecyclerView.Adapter
             "${booking.date} • ${booking.startTime} - ${booking.endTime}"
         }
 
-        holder.tvBookingDate.text = dateLabel
+        holder.tvDate.text = dateLabel
+
+        holder.btnAccept.setOnClickListener { onAccept(booking) }
+        holder.btnDecline.setOnClickListener { onDecline(booking) }
     }
 
     override fun getItemCount() = bookings.size
-    
+
     fun updateData(newBookings: List<Booking>) {
         bookings = newBookings
         notifyDataSetChanged()

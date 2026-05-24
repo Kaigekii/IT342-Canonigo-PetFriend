@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:layout_marginBottom="6dp"
+    android:background="@drawable/bg_card_cream">
+
+    <TextView
+        android:id="@+id/tvThreadName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:textColor="@color/gray_dark" />
+
+    <TextView
+        android:id="@+id/tvThreadPreview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preview"
+        android:textSize="12sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginTop="2dp" />
+
+    <TextView
+        android:id="@+id/tvThreadTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="11sp"
+        android:textColor="@color/gray_light"
+        android:layout_marginTop="2dp" />
+</LinearLayout>

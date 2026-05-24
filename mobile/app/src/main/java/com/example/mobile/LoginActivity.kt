@@ -131,6 +131,8 @@ class LoginActivity : Activity() {
         val role = prefsManager.getRole()
         if (role == "PET_OWNER") {
             startActivity(Intent(this, com.example.mobile.features.dashboard.OwnerMainActivity::class.java))
+        } else if (role == "PET_SITTER") {
+            startActivity(Intent(this, com.example.mobile.features.dashboard.SitterMainActivity::class.java))
         } else {
             startActivity(Intent(this, DashboardActivity::class.java))
         }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card_light"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+
+    <TextView
+        android:id="@+id/tvSitterName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sitter Name"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/gray_dark" />
+
+    <TextView
+        android:id="@+id/tvSitterMeta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location • Experience"
+        android:textSize="13sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/tvSitterServices"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Services"
+        android:textSize="13sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginTop="6dp" />
+
+    <TextView
+        android:id="@+id/tvSitterRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rating"
+        android:textSize="12sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginTop="6dp" />
+</LinearLayout>

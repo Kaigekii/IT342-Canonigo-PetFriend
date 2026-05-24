@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card_light"
+    android:padding="14dp"
+    android:layout_marginBottom="12dp">
+
+    <TextView
+        android:id="@+id/tvRequestOwner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Owner"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/gray_dark" />
+
+    <TextView
+        android:id="@+id/tvRequestService"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Service"
+        android:textSize="13sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/tvRequestDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:textSize="13sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginTop="6dp" />
+
+    <TextView
+        android:id="@+id/tvRequestPets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pets"
+        android:textSize="12sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginTop="4dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAcceptRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Accept"
+            android:textStyle="bold"
+            android:textColor="@color/gray_dark"
+            android:background="@drawable/bg_button_peach"
+            app:cornerRadius="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDeclineRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Decline"
+            android:textStyle="bold"
+            android:textColor="@color/gray_dark"
+            android:backgroundTint="@color/error_red"
+            android:layout_marginStart="8dp"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+</LinearLayout>

@@ -4,12 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobile.R
+import com.example.mobile.features.pets.AddEditPetActivity
 import com.example.mobile.features.bookings.BookingAdapter
+import com.example.mobile.features.pets.PetListFragment
 import com.example.mobile.features.pets.PetAdapter
 import com.example.mobile.network.RetrofitClient
 import com.example.mobile.util.PreferencesManager
@@ -29,6 +33,8 @@ class HomeFragment : Fragment() {
     private lateinit var rvBookings: RecyclerView
     private lateinit var petAdapter: PetAdapter
     private lateinit var bookingAdapter: BookingAdapter
+    private lateinit var btnAddPet: ImageView
+    private lateinit var tvViewPets: TextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
@@ -36,8 +42,11 @@ class HomeFragment : Fragment() {
         
         rvPets = view.findViewById(R.id.rvPets)
         rvBookings = view.findViewById(R.id.rvBookings)
+        btnAddPet = view.findViewById(R.id.btnAddPet)
+        tvViewPets = view.findViewById(R.id.tvViewPets)
         
         setupRecyclerViews()
+        setupActions()
         loadDashboardData()
         
         return view
@@ -51,6 +60,19 @@ class HomeFragment : Fragment() {
         bookingAdapter = BookingAdapter(emptyList())
         rvBookings.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         rvBookings.adapter = bookingAdapter
+    }
+
+    private fun setupActions() {
+        btnAddPet.setOnClickListener {
+            startActivity(AddEditPetActivity.newIntent(requireContext(), null))
+        }
+
+        tvViewPets.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, PetListFragment())
+                .addToBackStack(null)
+                .commit()
+        }
     }
     
     private fun loadDashboardData() {

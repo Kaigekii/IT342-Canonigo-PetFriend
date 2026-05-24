@@ -6,29 +6,36 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobile.R
+import com.google.android.material.button.MaterialButton
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class BookingAdapter(private var bookings: List<Booking>) : RecyclerView.Adapter<BookingAdapter.BookingViewHolder>() {
+class BookingListAdapter(
+    private var bookings: List<Booking>,
+    private val onCancel: (Booking) -> Unit
+) : RecyclerView.Adapter<BookingListAdapter.BookingViewHolder>() {
 
     class BookingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvBookingService: TextView = view.findViewById(R.id.tvBookingService)
-        val tvBookingStatus: TextView = view.findViewById(R.id.tvBookingStatus)
-        val tvBookingDate: TextView = view.findViewById(R.id.tvBookingDate)
-        val tvBookingSitter: TextView = view.findViewById(R.id.tvBookingSitter)
+        val tvService: TextView = view.findViewById(R.id.tvBookingService)
+        val tvStatus: TextView = view.findViewById(R.id.tvBookingStatus)
+        val tvDate: TextView = view.findViewById(R.id.tvBookingDate)
+        val tvSitter: TextView = view.findViewById(R.id.tvBookingSitter)
+        val tvPets: TextView = view.findViewById(R.id.tvBookingPets)
+        val btnCancel: MaterialButton = view.findViewById(R.id.btnCancelBooking)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookingViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_booking_card, parent, false)
+            .inflate(R.layout.item_booking_list_card, parent, false)
         return BookingViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: BookingViewHolder, position: Int) {
         val booking = bookings[position]
-        holder.tvBookingService.text = booking.serviceType
-        holder.tvBookingStatus.text = booking.status
-        holder.tvBookingSitter.text = "Sitter: ${booking.sitterName ?: "TBD"}"
+        holder.tvService.text = booking.serviceType
+        holder.tvStatus.text = booking.status
+        holder.tvSitter.text = booking.sitterName ?: "Sitter TBD"
+        holder.tvPets.text = if (booking.petNames.isEmpty()) "Pets: -" else "Pets: ${booking.petNames.joinToString(", ")}" 
 
         val dateLabel = try {
             val dateParser = SimpleDateFormat("yyyy-MM-dd", Locale.US)
@@ -49,11 +56,15 @@ class BookingAdapter(private var bookings: List<Booking>) : RecyclerView.Adapter
             "${booking.date} • ${booking.startTime} - ${booking.endTime}"
         }
 
-        holder.tvBookingDate.text = dateLabel
+        holder.tvDate.text = dateLabel
+
+        val canCancel = booking.status == "PENDING" || booking.status == "CONFIRMED"
+        holder.btnCancel.visibility = if (canCancel) View.VISIBLE else View.GONE
+        holder.btnCancel.setOnClickListener { onCancel(booking) }
     }
 
     override fun getItemCount() = bookings.size
-    
+
     fun updateData(newBookings: List<Booking>) {
         bookings = newBookings
         notifyDataSetChanged()

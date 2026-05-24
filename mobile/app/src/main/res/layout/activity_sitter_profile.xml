@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/background_cream">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_light"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvSitterProfileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sitter Name"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/gray_dark" />
+
+            <TextView
+                android:id="@+id/tvSitterProfileLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location"
+                android:textSize="13sp"
+                android:textColor="@color/gray_text"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvSitterProfileRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rating"
+                android:textSize="12sp"
+                android:textColor="@color/gray_text"
+                android:layout_marginTop="6dp" />
+
+            <TextView
+                android:id="@+id/tvSitterProfileRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rate"
+                android:textSize="13sp"
+                android:textColor="@color/gray_dark"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/tvSitterProfileBio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bio"
+                android:textSize="13sp"
+                android:textColor="@color/gray_text"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/tvSitterProfileExperience"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Experience"
+                android:textSize="13sp"
+                android:textColor="@color/gray_text"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/tvSitterProfileServices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Services"
+                android:textSize="13sp"
+                android:textColor="@color/gray_text"
+                android:layout_marginTop="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBookSitter"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:text="Book Now"
+                android:textStyle="bold"
+                android:textColor="@color/gray_dark"
+                android:background="@drawable/bg_button_peach"
+                android:layout_marginTop="16dp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reviews"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/gray_dark"
+            android:layout_marginBottom="12dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSitterReviews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
+
+    </LinearLayout>
+</ScrollView>

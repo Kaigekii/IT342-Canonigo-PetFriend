@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card_light"
+    android:padding="12dp"
+    android:layout_marginBottom="10dp">
+
+    <TextView
+        android:id="@+id/tvReviewerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reviewer"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/gray_dark" />
+
+    <TextView
+        android:id="@+id/tvReviewMeta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="5 stars • Date"
+        android:textSize="12sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginTop="2dp" />
+
+    <TextView
+        android:id="@+id/tvReviewComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Comment"
+        android:textSize="13sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginTop="8dp" />
+</LinearLayout>
