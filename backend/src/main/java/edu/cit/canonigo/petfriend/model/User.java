@@ -37,6 +37,9 @@ public class User {
     @Column(length = 500)
     private String profilePhotoUrl;
 
+    @Column(length = 255)
+    private String supabaseId;
+
     @Column
     private Boolean isVerified;
 
@@ -140,6 +143,14 @@ public class User {
 
     public void setProfilePhotoUrl(String profilePhotoUrl) {
         this.profilePhotoUrl = profilePhotoUrl;
+    }
+
+    public String getSupabaseId() {
+        return supabaseId;
+    }
+
+    public void setSupabaseId(String supabaseId) {
+        this.supabaseId = supabaseId;
     }
 
     public Boolean getIsVerified() {

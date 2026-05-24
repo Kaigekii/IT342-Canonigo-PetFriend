@@ -58,7 +58,7 @@ public class SecurityConfig {
                 })
             )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register", "/api/auth/login", "/error").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/google", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

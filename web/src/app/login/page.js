@@ -10,6 +10,17 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const handleGoogleSignIn = async () => {
+    const { supabase } = await import("@/shared/utils/supabaseClient");
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) setError(error.message);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -138,6 +149,40 @@ export default function LoginPage() {
       cursor: "not-allowed",
       boxShadow: "0px 2px 6px rgba(0,0,0,0.05)",
     },
+    googleButton: {
+      width: "100%",
+      height: "48px",
+      backgroundColor: "#ffffff",
+      border: "2px solid #D3D3D3",
+      borderRadius: "12px",
+      fontSize: "14px",
+      fontWeight: 600,
+      color: "#333333",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "10px",
+      transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+      boxShadow: "0px 2px 6px rgba(0,0,0,0.06)",
+    },
+    divider: {
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      margin: "20px 0",
+    },
+    dividerLine: {
+      flex: 1,
+      height: "1px",
+      backgroundColor: "#D3D3D3",
+    },
+    dividerText: {
+      fontSize: "12px",
+      color: "#999999",
+      fontWeight: 500,
+      whiteSpace: "nowrap",
+    },
     footer: {
       textAlign: "center",
       marginTop: "24px",
@@ -210,6 +255,36 @@ export default function LoginPage() {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+
+        {/* Divider */}
+        <div style={styles.divider}>
+          <div style={styles.dividerLine} />
+          <span style={styles.dividerText}>or continue with</span>
+          <div style={styles.dividerLine} />
+        </div>
+
+        {/* Google Sign-In Button */}
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          style={styles.googleButton}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "#B6E5D8";
+            e.currentTarget.style.boxShadow = "0px 4px 12px rgba(0,0,0,0.12)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "#D3D3D3";
+            e.currentTarget.style.boxShadow = "0px 2px 6px rgba(0,0,0,0.06)";
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
+            <path d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z" fill="#FFC107"/>
+            <path d="M6.3 14.7l7 5.1C15.1 16 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.3 2 9.7 7.4 6.3 14.7z" fill="#FF3D00"/>
+            <path d="M24 46c5.5 0 10.5-1.9 14.3-5.1l-6.6-5.6C29.6 37 26.9 38 24 38c-6.1 0-10.7-3.1-11.8-7.5l-7 5.4C8.8 42.3 15.9 46 24 46z" fill="#4CAF50"/>
+            <path d="M44.5 20H24v8.5h11.8c-.8 2.4-2.4 4.4-4.5 5.8l6.6 5.6C41.8 36.9 45 31 45 24c0-1.3-.2-2.7-.5-4z" fill="#1976D2"/>
+          </svg>
+          Sign in with Google
+        </button>
 
         <div style={styles.footer}>
           Don't have an account?{" "}
