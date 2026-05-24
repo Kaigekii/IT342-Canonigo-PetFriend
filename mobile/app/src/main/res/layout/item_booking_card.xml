@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#D3D3D3">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/tvBookingService"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Service Type"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#333333"/>
+
+            <TextView
+                android:id="@+id/tvBookingStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#1976D2"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvBookingDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date Range"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/tvBookingSitter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sitter Name"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginTop="4dp"/>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

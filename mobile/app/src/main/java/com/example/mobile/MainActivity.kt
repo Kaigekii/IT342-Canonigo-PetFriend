@@ -14,8 +14,13 @@ class MainActivity : Activity() {
         
         // Check if user is already logged in
         if (token != null) {
-            // User is logged in, go to Dashboard
-            startActivity(Intent(this, DashboardActivity::class.java))
+            // User is logged in, check role
+            val role = prefsManager.getRole()
+            if (role == "PET_OWNER") {
+                startActivity(Intent(this, com.example.mobile.features.dashboard.OwnerMainActivity::class.java))
+            } else {
+                startActivity(Intent(this, DashboardActivity::class.java))
+            }
         } else {
             // User is not logged in, go to Splash screen
             startActivity(Intent(this, SplashActivity::class.java))

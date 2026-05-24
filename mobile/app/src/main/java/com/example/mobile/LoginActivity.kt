@@ -128,7 +128,12 @@ class LoginActivity : Activity() {
     }
     
     private fun navigateToDashboard() {
-        startActivity(Intent(this, DashboardActivity::class.java))
+        val role = prefsManager.getRole()
+        if (role == "PET_OWNER") {
+            startActivity(Intent(this, com.example.mobile.features.dashboard.OwnerMainActivity::class.java))
+        } else {
+            startActivity(Intent(this, DashboardActivity::class.java))
+        }
         finish()
     }
 
