@@ -28,6 +28,7 @@ import edu.cit.canonigo.petfriend.model.User;
 import edu.cit.canonigo.petfriend.model.UserRole;
 import edu.cit.canonigo.petfriend.repository.UserRepository;
 import edu.cit.canonigo.petfriend.security.TokenProvider;
+import edu.cit.canonigo.petfriend.shared.email.EmailService;
 import jakarta.validation.Valid;
 
 /**
@@ -43,6 +44,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final TokenProvider tokenProvider;
+    private final EmailService emailService;
 
     @Value("${supabase.url}")
     private String supabaseUrl;
@@ -53,11 +55,13 @@ public class AuthController {
     public AuthController(UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
                           AuthenticationManager authenticationManager,
-                          TokenProvider tokenProvider) {
+                          TokenProvider tokenProvider,
+                          EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
+        this.emailService = emailService;
     }
 
     /**
@@ -95,6 +99,7 @@ public class AuthController {
             isVerified
         );
         userRepository.save(user);
+        emailService.sendWelcomeEmail(user.getEmail(), user.getFirstName());
 
         // Generate token and return response
         String token = tokenProvider.createToken(user);
@@ -204,6 +209,7 @@ public class AuthController {
             Optional<User> existingUserOpt = userRepository.findByEmail(email);
 
             User user;
+            boolean isNewUser = false;
             if (existingUserOpt.isPresent()) {
                 user = existingUserOpt.get();
                 
@@ -253,11 +259,15 @@ public class AuthController {
                     isVerified
                 );
                 user.setSupabaseId(supabaseId);
+                isNewUser = true;
             }
 
             // Update last login
             user.setLastLoginAt(Instant.now());
             userRepository.save(user);
+            if (isNewUser) {
+                emailService.sendWelcomeEmail(user.getEmail(), user.getFirstName());
+            }
 
             // Generate token and return response
             String jwtToken = tokenProvider.createToken(user);
