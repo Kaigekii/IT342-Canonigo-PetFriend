@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+function buildImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${API_BASE}${url}`;
+  return url;
+}
+
 const styles = {
   page: {
     minHeight: "100vh",
@@ -224,6 +231,8 @@ const styles = {
     height: 62,
     borderRadius: 8,
     backgroundColor: "#FFB6C1",
+    position: "relative",
+    overflow: "hidden",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -264,6 +273,8 @@ const styles = {
     height: 40,
     borderRadius: "50%",
     backgroundColor: "#FFB6C1",
+    position: "relative",
+    overflow: "hidden",
     flexShrink: 0,
   },
   bookingName: {
@@ -518,7 +529,12 @@ export default function PetOwnerDashboardPage() {
           <span style={styles.topRightRole}>Pet Owner</span>
           <button
             type="button"
-            style={styles.avatarButton}
+            style={{
+              ...styles.avatarButton,
+              backgroundImage: user?.profilePhotoUrl ? `url(${buildImageUrl(user.profilePhotoUrl)})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
             aria-label="Open profile menu"
             onClick={() => setShowProfileMenu((prev) => !prev)}
           />
@@ -592,7 +608,19 @@ export default function PetOwnerDashboardPage() {
             ) : (
               pets.slice(0, 4).map((p) => (
                 <div key={p.petId} style={styles.petCard}>
-                  <div style={styles.petPhoto}>Photo</div>
+                  <div style={styles.petPhoto}>
+                    <span>No Photo</span>
+                    {p.photoUrl && (
+                      <img
+                        src={buildImageUrl(p.photoUrl)}
+                        alt={p.name}
+                        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    )}
+                  </div>
                   <div>
                     <div style={styles.petName}>{p.name}</div>
                     <div style={styles.petMeta}>
@@ -615,7 +643,18 @@ export default function PetOwnerDashboardPage() {
           ) : (
             <div style={styles.bookingCard}>
               <div style={styles.bookingLeft}>
-                <div style={styles.bookingAvatar} />
+                <div style={styles.bookingAvatar}>
+                  {primaryUpcoming.sitterProfilePhotoUrl && (
+                    <img
+                      src={buildImageUrl(primaryUpcoming.sitterProfilePhotoUrl)}
+                      alt={primaryUpcoming.sitterName || "Pet sitter"}
+                      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  )}
+                </div>
                 <div>
                   <div style={styles.bookingName}>{primaryUpcoming.sitterName || "Pending Sitter"}</div>
                   <div style={styles.bookingMeta}>

@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+function buildImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${API_BASE}${url}`;
+  return url;
+}
+
 const STATUS_TABS = [
   { key: "ALL", label: "All" },
   { key: "PENDING", label: "Pending" },
@@ -457,7 +464,12 @@ export default function PetSitterRequestsPage() {
           <span style={styles.topRightRole}>Pet Sitter</span>
           <button
             type="button"
-            style={styles.avatarButton}
+            style={{
+              ...styles.avatarButton,
+              backgroundImage: user?.profilePhotoUrl ? `url(${buildImageUrl(user.profilePhotoUrl)})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
             aria-label="Open profile menu"
             onClick={() => setShowProfileMenu((prev) => !prev)}
           />

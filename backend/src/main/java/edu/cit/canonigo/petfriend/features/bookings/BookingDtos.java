@@ -125,6 +125,7 @@ public class BookingDtos {
         private String ownerName;
         private UUID sitterId;
         private String sitterName;
+        private String sitterProfilePhotoUrl;
         private ServiceType serviceType;
         private LocalDate date;
         private LocalTime startTime;
@@ -144,6 +145,7 @@ public class BookingDtos {
             r.sitterName = booking.getSitter() != null
                     ? booking.getSitter().getFirstName() + " " + booking.getSitter().getLastName()
                     : null;
+                r.sitterProfilePhotoUrl = booking.getSitter() != null ? booking.getSitter().getProfilePhotoUrl() : null;
             r.serviceType = booking.getServiceType();
             r.date = booking.getDate();
             r.startTime = booking.getStartTime();
@@ -175,6 +177,10 @@ public class BookingDtos {
 
         public String getSitterName() {
             return sitterName;
+        }
+
+        public String getSitterProfilePhotoUrl() {
+            return sitterProfilePhotoUrl;
         }
 
         public ServiceType getServiceType() {

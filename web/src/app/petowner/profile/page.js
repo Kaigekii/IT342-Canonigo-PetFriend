@@ -147,6 +147,8 @@ const styles = {
     borderRadius: "50%",
     backgroundColor: "#BEBEBE",
     color: "#333333",
+    position: "relative",
+    overflow: "hidden",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -345,9 +347,27 @@ function combineName(firstName, lastName) {
   return [firstName, lastName].filter(Boolean).join(" ").trim();
 }
 
+function buildImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${API_BASE}${url}`;
+  return url;
+}
+
+function getInitials(name) {
+  if (!name) return "PF";
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
+}
+
 export default function PetOwnerProfilePage() {
   const router = useRouter();
   const menuRef = useRef(null);
+  const photoInputRef = useRef(null);
 
   const token = useMemo(() => {
     if (typeof window === "undefined") return null;
@@ -364,6 +384,8 @@ export default function PetOwnerProfilePage() {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [notifications, setNotifications] = useState([true, true, false, false]);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
+  const [profilePhotoFile, setProfilePhotoFile] = useState(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -430,6 +452,39 @@ export default function PetOwnerProfilePage() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     router.replace("/login");
+  };
+
+  const handleProfilePhotoSelect = (event) => {
+    const file = event.target.files?.[0] || null;
+    if (!file) {
+      setProfilePhotoFile(null);
+      setProfilePhotoPreview("");
+      return;
+    }
+    setProfilePhotoFile(file);
+    setProfilePhotoPreview(URL.createObjectURL(file));
+  };
+
+  const uploadProfilePhoto = async () => {
+    if (!token || !profilePhotoFile) return;
+    const formData = new FormData();
+    formData.append("file", profilePhotoFile);
+
+    const res = await fetch(`${API_BASE}/api/uploads/profile-photo`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to upload photo");
+    }
+
+    const data = await res.json();
+    setProfilePhotoUrl(data?.url || "");
+    setProfilePhotoFile(null);
+    setProfilePhotoPreview("");
   };
 
   const handleSaveChanges = async () => {
@@ -542,9 +597,68 @@ export default function PetOwnerProfilePage() {
 
         <section style={styles.card}>
           <div style={styles.photoRow}>
-            <div style={styles.photoCircle}>{profilePhotoUrl ? "Photo" : "Photo"}</div>
+            <div style={styles.photoCircle}>
+              <span>{getInitials(fullName)}</span>
+              {(profilePhotoPreview || profilePhotoUrl) && (
+                <img
+                  src={profilePhotoPreview || buildImageUrl(profilePhotoUrl)}
+                  alt="Profile"
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              )}
+            </div>
             <div>
-              <button type="button" style={styles.secondaryBtn} disabled={saving}>Upload New Photo</button>
+              <button
+                type="button"
+                style={styles.secondaryBtn}
+                disabled={saving}
+                onClick={() => photoInputRef.current?.click()}
+              >
+                Upload New Photo
+              </button>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePhotoSelect}
+                style={{ display: "none" }}
+              />
+              {profilePhotoFile && (
+                <div style={{ marginTop: 8, display: "flex", gap: 8 }}>
+                  <button
+                    type="button"
+                    style={styles.secondaryBtn}
+                    onClick={async () => {
+                      try {
+                        setSaving(true);
+                        await uploadProfilePhoto();
+                        setSuccess("Photo updated successfully");
+                      } catch (err) {
+                        setError(err?.message || "Failed to upload photo");
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                    disabled={saving}
+                  >
+                    Save Photo
+                  </button>
+                  <button
+                    type="button"
+                    style={styles.secondaryBtn}
+                    onClick={() => {
+                      setProfilePhotoFile(null);
+                      setProfilePhotoPreview("");
+                    }}
+                    disabled={saving}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
               <div style={styles.helperText}>Max 5MB . JPG, PNG</div>
             </div>
           </div>

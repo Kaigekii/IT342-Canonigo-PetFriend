@@ -6,11 +6,11 @@ This list is based on the current project scan and focuses on required items tha
 
 1. Email Sending (SMTP)
 - Required: send 1 account-related email and 1 system notification email using SMTP.
-- Status: no SMTP configuration or mail-sending service found.
+- Status: welcome email implemented (account-related). System notification email still needed.
 
 2. File Upload
 - Required: upload a file (image/pdf), store on server, link to DB record, and allow view/download.
-- Status: no upload endpoint or storage handling found.
+- Status: local upload implemented for profile and pet photos with /uploads serving.
 
 3. Payment Gateway (Sandbox)
 - Required: real payment provider in test mode; record payment results in DB; handle success/failure.

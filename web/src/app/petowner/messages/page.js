@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+function buildImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${API_BASE}${url}`;
+  return url;
+}
+
 const styles = {
   page: {
     minHeight: "100vh",
@@ -149,6 +156,8 @@ const styles = {
     height: 36,
     borderRadius: "50%",
     backgroundColor: "#D3D3D3",
+    position: "relative",
+    overflow: "hidden",
   },
   nameText: {
     fontSize: 14,
@@ -346,6 +355,7 @@ export default function PetOwnerMessagesPage() {
           id: booking.sitterId,
           name: booking.sitterName || "Pet Sitter",
           roleLabel: "Pet Sitter",
+          photoUrl: booking.sitterProfilePhotoUrl || "",
           threadId: thread?.threadId || null,
           lastMessage: thread?.lastMessage || "Start a conversation",
           lastMessageAt: thread?.lastMessageAt || "",
@@ -592,7 +602,14 @@ export default function PetOwnerMessagesPage() {
                     if (event.key === "Enter") setActiveId(conv.id);
                   }}
                 >
-                  <div style={styles.avatar} />
+                  <div
+                    style={{
+                      ...styles.avatar,
+                      backgroundImage: conv.photoUrl ? `url(${buildImageUrl(conv.photoUrl)})` : undefined,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  />
                   <div>
                     <div style={styles.nameText}>{conv.name}</div>
                     <div style={styles.previewText}>{conv.lastMessage || "Start a conversation"}</div>
@@ -604,7 +621,16 @@ export default function PetOwnerMessagesPage() {
 
             <section style={styles.chatPane}>
               <div style={styles.chatHeader}>
-                <div style={styles.avatar} />
+                <div
+                  style={{
+                    ...styles.avatar,
+                    backgroundImage: activeConversation?.photoUrl
+                      ? `url(${buildImageUrl(activeConversation.photoUrl)})`
+                      : undefined,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
                 <div>
                   <div style={styles.chatName}>{activeConversation?.name || "Select a conversation"}</div>
                   <div style={styles.chatMeta}>{activeConversation?.roleLabel || ""}</div>

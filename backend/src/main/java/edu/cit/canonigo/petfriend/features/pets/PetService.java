@@ -104,6 +104,25 @@ public class PetService {
         petRepository.delete(pet);
     }
 
+    public Pet updatePetPhoto(UUID ownerId, UUID petId, String photoUrl) throws PetException {
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new PetException("Owner not found"));
+
+        if (owner.getRole() != UserRole.PET_OWNER) {
+            throw new PetException("Only pet owners can update pets");
+        }
+
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new PetException("Pet not found"));
+
+        if (!pet.getOwner().getUserId().equals(owner.getUserId())) {
+            throw new PetException("You cannot update a pet that doesn't belong to you");
+        }
+
+        pet.setPhotoUrl(photoUrl);
+        return petRepository.save(pet);
+    }
+
     /**
      * Custom exception for pet-related errors.
      */

@@ -68,6 +68,11 @@ export const API_ENDPOINTS = {
     LIST_USERS: `${API_BASE}/api/admin/users`,
     LIST_BOOKINGS: `${API_BASE}/api/admin/bookings`,
   },
+
+  UPLOADS: {
+    PROFILE_PHOTO: `${API_BASE}/api/uploads/profile-photo`,
+    PET_PHOTO: (id) => `${API_BASE}/api/uploads/pets/${id}/photo`,
+  },
 };
 
 export default API_ENDPOINTS;

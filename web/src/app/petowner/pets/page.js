@@ -156,11 +156,14 @@ const styles = {
     height: 66,
     borderRadius: 8,
     backgroundColor: "#FFB6C1",
+    position: "relative",
+    overflow: "hidden",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: 11,
     fontWeight: 700,
+    color: "#333333",
   },
   petName: {
     fontSize: 20,
@@ -381,6 +384,13 @@ function asWeight(value) {
   return Number.isFinite(num) ? num : null;
 }
 
+function buildImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${API_BASE}${url}`;
+  return url;
+}
+
 export default function PetOwnerPetsPage() {
   const router = useRouter();
   const menuRef = useRef(null);
@@ -408,6 +418,8 @@ export default function PetOwnerPetsPage() {
   const [vaccinationStatus, setVaccinationStatus] = useState("UP_TO_DATE");
   const [specialNeeds, setSpecialNeeds] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState("");
 
   const resetForm = () => {
     setPetName("");
@@ -418,6 +430,8 @@ export default function PetOwnerPetsPage() {
     setVaccinationStatus("UP_TO_DATE");
     setSpecialNeeds("");
     setPhotoUrl("");
+    setPhotoFile(null);
+    setPhotoPreview("");
     setEditingPetId(null);
   };
 
@@ -485,6 +499,24 @@ export default function PetOwnerPetsPage() {
     router.replace("/login");
   };
 
+  const uploadPetPhoto = async (petId, file, authToken) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${API_BASE}/api/uploads/pets/${petId}/photo`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${authToken}` },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || "Failed to upload pet photo");
+    }
+
+    return res.json();
+  };
+
   const handleSavePet = async (e) => {
     e.preventDefault();
     setError("");
@@ -529,8 +561,13 @@ export default function PetOwnerPetsPage() {
         throw new Error(msg || "Failed to save pet");
       }
 
-      resetForm();
+      const savedPet = await res.json();
 
+      if (photoFile) {
+        await uploadPetPhoto(savedPet.petId, photoFile, token);
+      }
+
+      resetForm();
       await loadData(token);
       setSuccess(isEditing ? "Pet updated successfully" : "Pet saved successfully");
     } catch (e2) {
@@ -550,9 +587,23 @@ export default function PetOwnerPetsPage() {
     setVaccinationStatus(pet.vaccinationStatus || "UP_TO_DATE");
     setSpecialNeeds(pet.specialNeeds || "");
     setPhotoUrl(pet.photoUrl || "");
+    setPhotoFile(null);
+    setPhotoPreview("");
     setError("");
     setSuccess("");
     document.getElementById("add-pet-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handlePhotoSelect = (event) => {
+    const file = event.target.files?.[0] || null;
+    if (!file) {
+      setPhotoFile(null);
+      setPhotoPreview("");
+      return;
+    }
+
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
   };
 
   const handleDeletePet = async () => {
@@ -602,7 +653,12 @@ export default function PetOwnerPetsPage() {
           <span style={styles.topRightRole}>Pet Owner</span>
           <button
             type="button"
-            style={styles.avatarButton}
+            style={{
+              ...styles.avatarButton,
+              backgroundImage: user?.profilePhotoUrl ? `url(${buildImageUrl(user.profilePhotoUrl)})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
             aria-label="Open profile menu"
             onClick={() => setShowProfileMenu((prev) => !prev)}
           />
@@ -642,7 +698,19 @@ export default function PetOwnerPetsPage() {
           ) : (
             pets.map((pet) => (
               <div key={pet.petId} style={styles.petCard}>
-                <div style={styles.photoBox}>Photo</div>
+                <div style={styles.photoBox}>
+                  <span>No Photo</span>
+                  {pet.photoUrl && (
+                    <img
+                      src={buildImageUrl(pet.photoUrl)}
+                      alt={pet.name}
+                      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  )}
+                </div>
 
                 <div>
                   <div style={styles.petName}>{pet.name}</div>
@@ -707,7 +775,23 @@ export default function PetOwnerPetsPage() {
               </div>
               <div style={{ gridColumn: "1 / -1" }}>
                 <div style={styles.fieldLabel}>Photo Upload</div>
-                <div style={styles.uploadBox}>Drop image here or paste image URL below</div>
+                <div style={styles.uploadBox}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoSelect}
+                    disabled={saving}
+                  />
+                </div>
+                {photoPreview && (
+                  <div style={{ marginTop: 8 }}>
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 8 }}
+                    />
+                  </div>
+                )}
               </div>
               <div style={{ gridColumn: "1 / -1" }}>
                 <div style={styles.fieldLabel}>Photo URL (optional)</div>

@@ -152,6 +152,7 @@ public class AuthDtos {
         private String email;
         private String phoneNumber;
         private String address;
+        private String profilePhotoUrl;
         private UserRole role;
         private Boolean isVerified;
 
@@ -159,7 +160,7 @@ public class AuthDtos {
         }
 
         public AuthResponse(String token, UUID userId, String firstName, String lastName, 
-                          String email, String phoneNumber, String address, UserRole role, Boolean isVerified) {
+                          String email, String phoneNumber, String address, String profilePhotoUrl, UserRole role, Boolean isVerified) {
             this.token = token;
             this.userId = userId;
             this.firstName = firstName;
@@ -167,6 +168,7 @@ public class AuthDtos {
             this.email = email;
             this.phoneNumber = phoneNumber;
             this.address = address;
+            this.profilePhotoUrl = profilePhotoUrl;
             this.role = role;
             this.isVerified = isVerified;
         }
@@ -226,6 +228,14 @@ public class AuthDtos {
 
         public void setAddress(String address) {
             this.address = address;
+        }
+
+        public String getProfilePhotoUrl() {
+            return profilePhotoUrl;
+        }
+
+        public void setProfilePhotoUrl(String profilePhotoUrl) {
+            this.profilePhotoUrl = profilePhotoUrl;
         }
 
         public UserRole getRole() {

@@ -57,6 +57,7 @@ public class UserController {
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getAddress(),
+                user.getProfilePhotoUrl(),
                 user.getRole(),
                 user.getIsVerified()
             );
@@ -123,6 +124,7 @@ public class UserController {
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getAddress(),
+                user.getProfilePhotoUrl(),
                 user.getRole(),
                 user.getIsVerified()
             );
