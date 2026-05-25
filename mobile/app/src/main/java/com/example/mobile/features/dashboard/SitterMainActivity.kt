@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import com.example.mobile.R
 import com.example.mobile.features.bookings.SitterRequestsFragment
 import com.example.mobile.features.messages.MessagesFragment
-import com.example.mobile.features.profile.ProfileFragment
+import com.example.mobile.features.sitters.SitterProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SitterMainActivity : FragmentActivity() {
@@ -38,7 +38,7 @@ class SitterMainActivity : FragmentActivity() {
                 }
                 R.id.nav_sitter_profile -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, ProfileFragment())
+                        .replace(R.id.fragment_container, SitterProfileFragment())
                         .commit()
                     true
                 }

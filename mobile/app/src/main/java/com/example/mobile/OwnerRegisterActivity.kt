@@ -122,7 +122,7 @@ class OwnerRegisterActivity : Activity() {
                     )
 
                     Toast.makeText(this@OwnerRegisterActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@OwnerRegisterActivity, DashboardActivity::class.java))
+                    startActivity(Intent(this@OwnerRegisterActivity, com.example.mobile.features.dashboard.OwnerMainActivity::class.java))
                     finish()
                 } else {
                     val errorBody = response.errorBody()?.string()

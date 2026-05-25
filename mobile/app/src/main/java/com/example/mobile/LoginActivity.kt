@@ -134,7 +134,9 @@ class LoginActivity : Activity() {
         } else if (role == "PET_SITTER") {
             startActivity(Intent(this, com.example.mobile.features.dashboard.SitterMainActivity::class.java))
         } else {
-            startActivity(Intent(this, DashboardActivity::class.java))
+            prefsManager.clearAll()
+            Toast.makeText(this, "Unable to determine role. Please login again.", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, LoginActivity::class.java))
         }
         finish()
     }

@@ -1,27 +1,23 @@
 package com.example.mobile.features.bookings
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobile.R
 import com.example.mobile.network.RetrofitClient
 import com.example.mobile.util.PreferencesManager
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class OwnerBookingsFragment : Fragment() {
-
-    private val job = Job()
-    private val scope = CoroutineScope(Dispatchers.Main + job)
 
     private lateinit var prefsManager: PreferencesManager
     private lateinit var rvBookings: RecyclerView
@@ -31,6 +27,13 @@ class OwnerBookingsFragment : Fragment() {
 
     private lateinit var adapter: BookingListAdapter
     private var allBookings: List<Booking> = emptyList()
+
+    private val selectedFilterTint by lazy {
+        requireContext().getColor(R.color.blush_pink)
+    }
+    private val unselectedFilterTint by lazy {
+        requireContext().getColor(R.color.soft_peach)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_owner_bookings, container, false)
@@ -65,19 +68,21 @@ class OwnerBookingsFragment : Fragment() {
     private fun loadBookings() {
         val token = prefsManager.getAuthToken() ?: return
 
-        scope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
                     RetrofitClient.apiService.getMyBookings("Bearer $token", upcoming = false)
                 }
+                if (!isAdded) return@launch
+
                 if (response.isSuccessful) {
                     allBookings = response.body() ?: emptyList()
                     applyFilter("PENDING")
                 } else {
-                    Toast.makeText(requireContext(), "Failed to load bookings", Toast.LENGTH_SHORT).show()
+                    showToast("Failed to load bookings")
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error loading bookings", Toast.LENGTH_SHORT).show()
+                showToast("Error loading bookings")
             }
         }
     }
@@ -88,31 +93,47 @@ class OwnerBookingsFragment : Fragment() {
             "COMPLETED" -> allBookings.filter { it.status == "COMPLETED" }
             else -> allBookings.filter { it.status == "CONFIRMED" }
         }
+        updateFilterButtons(filter)
         adapter.updateData(filtered)
+    }
+
+    private fun updateFilterButtons(active: String) {
+        if (!isAdded) return
+
+        btnFilterPending.backgroundTintList = ColorStateList.valueOf(
+            if (active == "PENDING") selectedFilterTint else unselectedFilterTint
+        )
+        btnFilterActive.backgroundTintList = ColorStateList.valueOf(
+            if (active == "ACTIVE") selectedFilterTint else unselectedFilterTint
+        )
+        btnFilterCompleted.backgroundTintList = ColorStateList.valueOf(
+            if (active == "COMPLETED") selectedFilterTint else unselectedFilterTint
+        )
     }
 
     private fun cancelBooking(booking: Booking) {
         val token = prefsManager.getAuthToken() ?: return
         val request = UpdateOwnerBookingStatusRequest(status = "CANCELLED")
 
-        scope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
                     RetrofitClient.apiService.updateOwnerBookingStatus("Bearer $token", booking.bookingId, request)
                 }
+                if (!isAdded) return@launch
+
                 if (response.isSuccessful) {
                     loadBookings()
                 } else {
-                    Toast.makeText(requireContext(), "Failed to cancel booking", Toast.LENGTH_SHORT).show()
+                    showToast("Failed to cancel booking")
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error cancelling booking", Toast.LENGTH_SHORT).show()
+                showToast("Error cancelling booking")
             }
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        job.cancel()
+    private fun showToast(message: String) {
+        context?.let { android.widget.Toast.makeText(it, message, android.widget.Toast.LENGTH_SHORT).show() }
     }
 }

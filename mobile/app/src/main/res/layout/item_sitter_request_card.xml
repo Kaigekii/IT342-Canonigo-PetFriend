@@ -48,6 +48,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvRequestAmount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="PHP 0.00"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/gray_dark" />
+
+        <TextView
+            android:id="@+id/tvRequestStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PENDING"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="@color/gray_dark"
+            android:background="@drawable/bg_status_pending"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="10dp">
 
         <com.google.android.material.button.MaterialButton
@@ -68,6 +100,17 @@
             android:textStyle="bold"
             android:textColor="@color/gray_dark"
             android:backgroundTint="@color/error_red"
+            android:layout_marginStart="8dp"
+            app:cornerRadius="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCompleteRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Complete"
+            android:textStyle="bold"
+            android:textColor="@color/web_surface"
+            android:backgroundTint="@color/gray_dark"
             android:layout_marginStart="8dp"
             app:cornerRadius="8dp" />
     </LinearLayout>

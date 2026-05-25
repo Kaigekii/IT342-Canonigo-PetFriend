@@ -179,7 +179,7 @@ class RegisterActivity : Activity() {
     }
     
     private fun navigateToDashboard() {
-        startActivity(Intent(this, DashboardActivity::class.java))
+        startActivity(Intent(this, com.example.mobile.features.dashboard.OwnerMainActivity::class.java))
         finish()
     }
     

@@ -12,6 +12,9 @@ import com.example.mobile.features.messages.MessageThread
 import com.example.mobile.features.messages.SendMessageRequest
 import com.example.mobile.features.sitters.SitterDetail
 import com.example.mobile.features.sitters.SitterSummary
+import com.example.mobile.network.ReviewSummaryResponse
+import com.example.mobile.network.SitterProfileResponse
+import com.example.mobile.network.SitterProfileUpdateRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -137,4 +140,42 @@ interface ApiService {
         @Path("threadId") threadId: String,
         @Body request: SendMessageRequest
     ): Response<MessageItem>
+
+    @GET("api/reviews/sitter/{sitterId}/summary")
+    suspend fun getSitterReviewSummary(
+        @Header("Authorization") token: String,
+        @Path("sitterId") sitterId: String
+    ): Response<ReviewSummaryResponse>
+
+    @GET("api/sitter-profile")
+    suspend fun getSitterProfile(
+        @Header("Authorization") token: String
+    ): Response<SitterProfileResponse>
+
+    @GET("api/sitters/profile")
+    suspend fun getSitterProfileAlt(
+        @Header("Authorization") token: String
+    ): Response<SitterProfileResponse>
+
+    @PUT("api/sitter-profile")
+    suspend fun updateSitterProfile(
+        @Header("Authorization") token: String,
+        @Body request: SitterProfileUpdateRequest
+    ): Response<SitterProfileResponse>
+
+    @PUT("api/sitters/profile")
+    suspend fun updateSitterProfileAlt(
+        @Header("Authorization") token: String,
+        @Body request: SitterProfileUpdateRequest
+    ): Response<SitterProfileResponse>
+
+    @POST("api/sitter-profile/submit-verification")
+    suspend fun submitSitterVerification(
+        @Header("Authorization") token: String
+    ): Response<String>
+
+    @POST("api/sitters/profile/submit-verification")
+    suspend fun submitSitterVerificationAlt(
+        @Header("Authorization") token: String
+    ): Response<String>
 }

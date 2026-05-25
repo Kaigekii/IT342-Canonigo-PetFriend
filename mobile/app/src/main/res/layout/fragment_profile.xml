@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/background_cream">
+    android:background="@drawable/bg_app_motif">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,60 +27,154 @@
             android:background="@drawable/bg_card_light"
             android:padding="16dp">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/imgProfileAvatar"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:contentDescription="Profile avatar"
+                    android:background="@drawable/bg_avatar_circle" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:id="@+id/tvProfileName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Name"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/gray_dark" />
+
+                    <TextView
+                        android:id="@+id/tvProfileEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Email"
+                        android:textSize="13sp"
+                        android:textColor="@color/gray_text"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </LinearLayout>
+
             <TextView
-                android:id="@+id/tvProfileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Name"
-                android:textSize="18sp"
+                android:text="Account Details"
+                android:textSize="12sp"
                 android:textStyle="bold"
-                android:textColor="@color/gray_dark" />
-
-            <TextView
-                android:id="@+id/tvProfileEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Email"
-                android:textSize="13sp"
                 android:textColor="@color/gray_text"
-                android:layout_marginTop="6dp" />
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="88dp"
+                    android:layout_height="wrap_content"
+                    android:text="Role"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_text" />
+
+                <TextView
+                    android:id="@+id/tvProfileRole"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Role"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_dark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="88dp"
+                    android:layout_height="wrap_content"
+                    android:text="Phone"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_text" />
+
+                <TextView
+                    android:id="@+id/tvProfilePhone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Phone"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_dark" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="88dp"
+                    android:layout_height="wrap_content"
+                    android:text="Address"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_text" />
+
+                <TextView
+                    android:id="@+id/tvProfileAddress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Address"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_dark" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/tvProfileRole"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Role"
+                android:text="About"
                 android:textSize="12sp"
+                android:textStyle="bold"
                 android:textColor="@color/gray_text"
-                android:layout_marginTop="6dp" />
+                android:layout_marginBottom="8dp" />
 
             <TextView
-                android:id="@+id/tvProfilePhone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phone"
+                android:id="@+id/tvProfileBio"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:text="Tell us about yourself"
                 android:textSize="12sp"
-                android:textColor="@color/gray_text"
-                android:layout_marginTop="6dp" />
-
-            <TextView
-                android:id="@+id/tvProfileAddress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Address"
-                android:textSize="12sp"
-                android:textColor="@color/gray_text"
-                android:layout_marginTop="6dp" />
+                android:textColor="@color/gray_dark"
+                android:background="@drawable/bg_input_cream"
+                android:padding="12dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnProfileLogout"
-                android:layout_width="match_parent"
+                android:layout_width="140dp"
                 android:layout_height="44dp"
                 android:text="Logout"
                 android:textStyle="bold"
-                android:textColor="@color/gray_dark"
+                android:textColor="@color/web_surface"
                 android:backgroundTint="@color/error_red"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                android:layout_gravity="end" />
         </LinearLayout>
 
     </LinearLayout>

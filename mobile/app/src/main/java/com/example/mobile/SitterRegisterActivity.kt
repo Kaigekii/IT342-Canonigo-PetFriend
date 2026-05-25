@@ -122,7 +122,7 @@ class SitterRegisterActivity : Activity() {
                     )
 
                     Toast.makeText(this@SitterRegisterActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@SitterRegisterActivity, DashboardActivity::class.java))
+                    startActivity(Intent(this@SitterRegisterActivity, com.example.mobile.features.dashboard.SitterMainActivity::class.java))
                     finish()
                 } else {
                     val errorBody = response.errorBody()?.string()

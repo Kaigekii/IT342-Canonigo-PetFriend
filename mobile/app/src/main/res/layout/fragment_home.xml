@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@drawable/bg_app_motif">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,8 +21,8 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@android:drawable/ic_menu_sort_by_size"
-                app:tint="@color/web_surface"
+                android:src="@drawable/ic_nav_home"
+                app:tint="@color/gray_dark"
                 android:layout_marginEnd="16dp"/>
             <TextView
                 android:layout_width="wrap_content"
@@ -29,7 +30,7 @@
                 android:text="PETFRIEND"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@color/web_surface"/>
+                android:textColor="@color/gray_dark"/>
         </LinearLayout>
 
         <LinearLayout
@@ -44,7 +45,7 @@
                 android:text="My Pets"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@color/web_surface"
+                android:textColor="@color/gray_dark"
                 android:layout_marginEnd="12dp"/>
             <TextView
                 android:id="@+id/tvViewPets"
@@ -53,17 +54,17 @@
                 android:text="View all"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:textColor="@color/web_surface"
+                android:textColor="@color/gray_text"
                 android:layout_marginEnd="12dp"
                 android:alpha="0.85"/>
             <ImageView
                 android:id="@+id/btnAddPet"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@android:drawable/ic_input_add"
-                app:tint="@color/web_surface"
+                android:src="@drawable/ic_nav_add"
+                app:tint="@color/gray_dark"
                 android:padding="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
+                android:background="@drawable/bg_button_peach"/>
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -81,7 +82,7 @@
             android:text="Upcoming Bookings"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@color/web_surface"
+            android:textColor="@color/gray_dark"
             android:layout_marginBottom="16dp"/>
 
         <androidx.recyclerview.widget.RecyclerView

@@ -52,10 +52,6 @@
             android:exported="false" />
         
         <activity
-            android:name=".DashboardActivity"
-            android:exported="false" />
-        
-        <activity
             android:name=".features.dashboard.OwnerMainActivity"
             android:exported="false" />
 

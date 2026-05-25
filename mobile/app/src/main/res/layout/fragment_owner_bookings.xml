@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/background_cream">
+    android:background="@drawable/bg_app_motif">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
                 android:text="Pending"
                 android:textStyle="bold"
                 android:textColor="@color/gray_dark"
-                android:background="@drawable/bg_button_peach"
+                android:backgroundTint="@color/soft_peach"
                 app:cornerRadius="8dp" />
 
             <com.google.android.material.button.MaterialButton

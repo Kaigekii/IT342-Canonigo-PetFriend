@@ -6,7 +6,7 @@
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
-    app:cardBackgroundColor="#D3D3D3">
+    app:cardBackgroundColor="@color/card_surface_alt">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
                 android:text="Service Type"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:textColor="#333333"/>
+                android:textColor="@color/gray_dark"/>
 
             <TextView
                 android:id="@+id/tvBookingStatus"
@@ -37,7 +37,7 @@
                 android:text="Status"
                 android:textStyle="bold"
                 android:textSize="14sp"
-                android:textColor="#1976D2"/>
+                android:textColor="@color/gray_text"/>
         </LinearLayout>
 
         <TextView
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:text="Date Range"
             android:textSize="14sp"
-            android:textColor="#666666"
+            android:textColor="@color/gray_text"
             android:layout_marginTop="8dp"/>
 
         <TextView
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:text="Sitter Name"
             android:textSize="14sp"
-            android:textColor="#666666"
+            android:textColor="@color/gray_text"
             android:layout_marginTop="4dp"/>
 
     </LinearLayout>

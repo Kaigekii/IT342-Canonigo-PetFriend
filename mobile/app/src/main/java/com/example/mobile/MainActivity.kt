@@ -21,7 +21,8 @@ class MainActivity : Activity() {
             } else if (role == "PET_SITTER") {
                 startActivity(Intent(this, com.example.mobile.features.dashboard.SitterMainActivity::class.java))
             } else {
-                startActivity(Intent(this, DashboardActivity::class.java))
+                prefsManager.clearAll()
+                startActivity(Intent(this, LoginActivity::class.java))
             }
         } else {
             // User is not logged in, go to Splash screen

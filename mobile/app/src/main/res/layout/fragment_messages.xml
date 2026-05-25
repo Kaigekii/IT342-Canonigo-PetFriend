@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background_cream"
+    android:background="@drawable/bg_app_motif"
     android:padding="20dp">
 
     <TextView
@@ -33,15 +33,18 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvMessageThreads"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.4"
+            android:minHeight="120dp"
             android:background="@drawable/bg_card_light"
             android:padding="8dp"
-            android:clipToPadding="false" />
+            android:clipToPadding="false"
+            android:overScrollMode="ifContentScrolls" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="0.6"
             android:orientation="vertical"
             android:background="@drawable/bg_card_light"
             android:padding="12dp"

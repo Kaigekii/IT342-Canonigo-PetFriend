@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="@color/brand_cream_top"
+                android:endColor="@color/brand_cream_bottom" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_paw_motif"
+        android:gravity="top|start"
+        android:left="12dp"
+        android:top="18dp"
+        android:width="120dp"
+        android:height="120dp" />
+    <item
+        android:drawable="@drawable/ic_paw_motif"
+        android:gravity="center|end"
+        android:right="8dp"
+        android:width="110dp"
+        android:height="110dp" />
+    <item
+        android:drawable="@drawable/ic_paw_motif"
+        android:gravity="bottom|end"
+        android:right="16dp"
+        android:bottom="24dp"
+        android:width="140dp"
+        android:height="140dp" />
+</layer-list>

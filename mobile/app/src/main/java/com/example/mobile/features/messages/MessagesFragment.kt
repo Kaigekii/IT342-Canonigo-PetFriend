@@ -14,9 +14,8 @@ import com.example.mobile.R
 import com.example.mobile.network.RetrofitClient
 import com.example.mobile.util.PreferencesManager
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -24,9 +23,6 @@ import java.util.Locale
 import java.util.TimeZone
 
 class MessagesFragment : Fragment() {
-
-    private val job = Job()
-    private val scope = CoroutineScope(Dispatchers.Main + job)
 
     private lateinit var prefsManager: PreferencesManager
     private lateinit var rvThreads: RecyclerView
@@ -69,16 +65,19 @@ class MessagesFragment : Fragment() {
 
         btnSend.setOnClickListener { sendMessage() }
 
-        loadConversations()
-
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        loadConversations()
     }
 
     private fun loadConversations() {
         val token = prefsManager.getAuthToken() ?: return
         val role = prefsManager.getRole()
 
-        scope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val bookingsResponse = withContext(Dispatchers.IO) {
                     if (role == "PET_SITTER") {
@@ -92,7 +91,7 @@ class MessagesFragment : Fragment() {
                 }
 
                 if (!bookingsResponse.isSuccessful || !threadsResponse.isSuccessful) {
-                    Toast.makeText(requireContext(), "Failed to load conversations", Toast.LENGTH_SHORT).show()
+                    showToast("Failed to load conversations")
                     return@launch
                 }
 
@@ -131,6 +130,8 @@ class MessagesFragment : Fragment() {
                     }
                 }
 
+                if (!isAdded) return@launch
+
                 conversations = contactMap.values.toList()
                 threadAdapter.updateData(conversations)
 
@@ -138,7 +139,7 @@ class MessagesFragment : Fragment() {
                     selectConversation(conversations.first())
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error loading conversations", Toast.LENGTH_SHORT).show()
+                showToast("Error loading conversations")
             }
         }
     }
@@ -153,7 +154,7 @@ class MessagesFragment : Fragment() {
     private fun loadMessages(item: ConversationItem) {
         val token = prefsManager.getAuthToken() ?: return
 
-        scope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val threadId = if (item.threadId != null) {
                     item.threadId
@@ -165,7 +166,7 @@ class MessagesFragment : Fragment() {
                         )
                     }
                     if (!response.isSuccessful || response.body() == null) {
-                        Toast.makeText(requireContext(), "Failed to create thread", Toast.LENGTH_SHORT).show()
+                        showToast("Failed to create thread")
                         return@launch
                     }
                     val createdThread = response.body()!!
@@ -177,6 +178,8 @@ class MessagesFragment : Fragment() {
                     conversations = conversations.map { existing ->
                         if (existing.id == item.id) updated else existing
                     }
+                    if (!isAdded) return@launch
+
                     threadAdapter.updateData(conversations)
                     activeConversation = updated
                     createdThread.threadId
@@ -186,6 +189,8 @@ class MessagesFragment : Fragment() {
                     RetrofitClient.apiService.listThreadMessages("Bearer $token", threadId)
                 }
 
+                if (!isAdded) return@launch
+
                 if (response.isSuccessful) {
                     val messages = response.body() ?: emptyList()
                     val formatted = messages.map { msg ->
@@ -193,10 +198,10 @@ class MessagesFragment : Fragment() {
                     }
                     messageAdapter.updateData(formatted)
                 } else {
-                    Toast.makeText(requireContext(), "Failed to load messages", Toast.LENGTH_SHORT).show()
+                    showToast("Failed to load messages")
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error loading messages", Toast.LENGTH_SHORT).show()
+                showToast("Error loading messages")
             }
         }
     }
@@ -208,7 +213,7 @@ class MessagesFragment : Fragment() {
 
         if (content.isEmpty()) return
 
-        scope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val threadId = conversation.threadId ?: run {
                     val response = withContext(Dispatchers.IO) {
@@ -218,7 +223,7 @@ class MessagesFragment : Fragment() {
                         )
                     }
                     if (!response.isSuccessful || response.body() == null) {
-                        Toast.makeText(requireContext(), "Failed to create thread", Toast.LENGTH_SHORT).show()
+                        showToast("Failed to create thread")
                         return@launch
                     }
                     val createdThread = response.body()!!
@@ -230,6 +235,8 @@ class MessagesFragment : Fragment() {
                     conversations = conversations.map { existing ->
                         if (existing.id == conversation.id) updated else existing
                     }
+                    if (!isAdded) return@launch
+
                     threadAdapter.updateData(conversations)
                     activeConversation = updated
                     createdThread.threadId
@@ -243,16 +250,22 @@ class MessagesFragment : Fragment() {
                     )
                 }
 
+                if (!isAdded) return@launch
+
                 if (response.isSuccessful && response.body() != null) {
                     etMessage.setText("")
                     loadMessages(conversation)
                 } else {
-                    Toast.makeText(requireContext(), "Failed to send message", Toast.LENGTH_SHORT).show()
+                    showToast("Failed to send message")
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error sending message", Toast.LENGTH_SHORT).show()
+                showToast("Error sending message")
             }
         }
+    }
+
+    private fun showToast(message: String) {
+        context?.let { Toast.makeText(it, message, Toast.LENGTH_SHORT).show() }
     }
 
     private fun formatTimeLabel(value: String?): String {
@@ -272,8 +285,4 @@ class MessagesFragment : Fragment() {
         return value
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        job.cancel()
-    }
 }

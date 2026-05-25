@@ -13,7 +13,8 @@ import java.util.Locale
 class SitterRequestAdapter(
     private var bookings: List<Booking>,
     private val onAccept: (Booking) -> Unit,
-    private val onDecline: (Booking) -> Unit
+    private val onDecline: (Booking) -> Unit,
+    private val onComplete: (Booking) -> Unit
 ) : RecyclerView.Adapter<SitterRequestAdapter.RequestViewHolder>() {
 
     class RequestViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -21,8 +22,11 @@ class SitterRequestAdapter(
         val tvService: TextView = view.findViewById(R.id.tvRequestService)
         val tvDate: TextView = view.findViewById(R.id.tvRequestDate)
         val tvPets: TextView = view.findViewById(R.id.tvRequestPets)
+        val tvAmount: TextView = view.findViewById(R.id.tvRequestAmount)
+        val tvStatus: TextView = view.findViewById(R.id.tvRequestStatus)
         val btnAccept: MaterialButton = view.findViewById(R.id.btnAcceptRequest)
         val btnDecline: MaterialButton = view.findViewById(R.id.btnDeclineRequest)
+        val btnComplete: MaterialButton = view.findViewById(R.id.btnCompleteRequest)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RequestViewHolder {
@@ -57,9 +61,25 @@ class SitterRequestAdapter(
         }
 
         holder.tvDate.text = dateLabel
+        val amount = booking.totalAmount?.let { "PHP ${String.format("%.2f", it)}" } ?: "PHP 0.00"
+        holder.tvAmount.text = amount
+
+        val status = booking.status
+        holder.tvStatus.text = status
+        val statusBg = when (status) {
+            "CONFIRMED" -> R.drawable.bg_status_confirmed
+            "COMPLETED" -> R.drawable.bg_status_completed
+            else -> R.drawable.bg_status_pending
+        }
+        holder.tvStatus.setBackgroundResource(statusBg)
+
+        holder.btnAccept.visibility = if (status == "PENDING") View.VISIBLE else View.GONE
+        holder.btnDecline.visibility = if (status == "PENDING") View.VISIBLE else View.GONE
+        holder.btnComplete.visibility = if (status == "CONFIRMED") View.VISIBLE else View.GONE
 
         holder.btnAccept.setOnClickListener { onAccept(booking) }
         holder.btnDecline.setOnClickListener { onDecline(booking) }
+        holder.btnComplete.setOnClickListener { onComplete(booking) }
     }
 
     override fun getItemCount() = bookings.size

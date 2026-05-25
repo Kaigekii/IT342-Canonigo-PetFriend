@@ -4,17 +4,23 @@
     <color name="white">#FFFFFFFF</color>
     
     <!-- Design System Colors -->
-    <color name="background_cream">#FFF8F0</color>
-    <color name="soft_peach">#FFD8B9</color>
-    <color name="blush_pink">#FFB6C1</color>
-    <color name="mint_green">#B6E5D8</color>
-    <color name="error_red">#FFCCBC</color>
+    <color name="background_cream">#FFF6EE</color>
+    <color name="soft_peach">#FFD4B0</color>
+    <color name="blush_pink">#FFC3C9</color>
+    <color name="mint_green">#BFE5D4</color>
+    <color name="error_red">#F2B8A5</color>
     
     <!-- Neutrals -->
-    <color name="gray_dark">#333333</color>
-    <color name="gray_border">#D3D3D3</color>
-    <color name="gray_light">#999999</color>
-    <color name="gray_text">#666666</color>
+    <color name="gray_dark">#2F2A26</color>
+    <color name="gray_border">#E6D6C9</color>
+    <color name="gray_light">#9A8F86</color>
+    <color name="gray_text">#5C544C</color>
+
+    <color name="brand_cream_top">#FFF9F2</color>
+    <color name="brand_cream_bottom">#FFEFE4</color>
+    <color name="card_surface">#FFFDF9</color>
+    <color name="card_surface_alt">#FFF7F0</color>
+    <color name="motif_paw">#22D2C4B5</color>
     
     <!-- Legacy Colors (keep for compatibility) -->
     <color name="primary">#5E35B1</color>
