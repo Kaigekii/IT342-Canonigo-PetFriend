@@ -83,6 +83,7 @@ public class SitterControllerTest {
         new SitterDtos.SitterDetailResponse(
             sitterId,
             "Jane Sitter",
+            null,
             "Experienced sitter",
             "3 years",
             new BigDecimal("150.00"),
@@ -120,6 +121,7 @@ public class SitterControllerTest {
         new SitterDtos.SitterDetailResponse(
             sitterId,
             "Jane Sitter",
+            null,
             "Experienced sitter",
             "3 years",
             new BigDecimal("150.00"),
