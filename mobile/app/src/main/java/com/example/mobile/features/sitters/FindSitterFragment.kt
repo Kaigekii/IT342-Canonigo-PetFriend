@@ -76,12 +76,19 @@ class FindSitterFragment : Fragment() {
                     RetrofitClient.apiService.searchSitters("Bearer $token", location, serviceType)
                 }
                 if (response.isSuccessful) {
+                    if (!isAdded) return@launch
                     adapter.updateData(response.body() ?: emptyList())
                 } else {
-                    Toast.makeText(requireContext(), "Failed to load sitters", Toast.LENGTH_SHORT).show()
+                    if (!isAdded) return@launch
+                    context?.let {
+                        Toast.makeText(it, "Failed to load sitters", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error loading sitters", Toast.LENGTH_SHORT).show()
+                if (!isAdded) return@launch
+                context?.let {
+                    Toast.makeText(it, "Error loading sitters", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

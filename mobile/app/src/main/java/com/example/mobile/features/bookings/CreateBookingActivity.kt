@@ -5,6 +5,7 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -12,7 +13,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mobile.R
 import com.example.mobile.features.pets.Pet
+import com.example.mobile.features.payments.PaymentWebViewActivity
 import com.example.mobile.network.RetrofitClient
+import com.example.mobile.network.PaymentCheckoutRequest
 import com.example.mobile.util.PreferencesManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -40,6 +43,7 @@ class CreateBookingActivity : AppCompatActivity() {
     private lateinit var btnSubmit: MaterialButton
 
     private var sitterId: String? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,8 +175,33 @@ class CreateBookingActivity : AppCompatActivity() {
                     RetrofitClient.apiService.createBooking("Bearer $token", request)
                 }
                 if (response.isSuccessful) {
-                    Toast.makeText(this@CreateBookingActivity, "Booking requested", Toast.LENGTH_SHORT).show()
-                    finish()
+                    val booking = response.body()
+                    if (booking == null) {
+                        Toast.makeText(this@CreateBookingActivity, "Booking created, but payment failed", Toast.LENGTH_SHORT).show()
+                        btnSubmit.isEnabled = true
+                        return@launch
+                    }
+
+                    Log.d(TAG, "Booking created: ${booking.bookingId}")
+
+                    val paymentResponse = withContext(Dispatchers.IO) {
+                        RetrofitClient.apiService.createPaymentCheckout(
+                            "Bearer $token",
+                            PaymentCheckoutRequest(bookingId = booking.bookingId)
+                        )
+                    }
+
+                    if (paymentResponse.isSuccessful && paymentResponse.body() != null) {
+                        val checkoutUrl = paymentResponse.body()!!.checkoutUrl
+                        startActivity(PaymentWebViewActivity.newIntent(this@CreateBookingActivity, checkoutUrl))
+                        finish()
+                    } else {
+                        val errorBody = paymentResponse.errorBody()?.string()?.takeIf { it.isNotBlank() }
+                        Log.e(TAG, "Payment checkout failed: ${paymentResponse.code()} ${errorBody ?: ""}")
+                        val msg = errorBody ?: "Booking created, but payment failed (${paymentResponse.code()})"
+                        Toast.makeText(this@CreateBookingActivity, msg, Toast.LENGTH_SHORT).show()
+                        btnSubmit.isEnabled = true
+                    }
                 } else {
                     Toast.makeText(this@CreateBookingActivity, "Failed to create booking", Toast.LENGTH_SHORT).show()
                     btnSubmit.isEnabled = true
@@ -190,6 +219,7 @@ class CreateBookingActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val TAG = "CreateBookingActivity"
         private const val EXTRA_SITTER_ID = "extra_sitter_id"
         private const val EXTRA_SITTER_NAME = "extra_sitter_name"
 

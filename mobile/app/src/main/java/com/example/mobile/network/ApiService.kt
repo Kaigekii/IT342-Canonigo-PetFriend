@@ -15,6 +15,8 @@ import com.example.mobile.features.sitters.SitterSummary
 import com.example.mobile.network.ReviewSummaryResponse
 import com.example.mobile.network.SitterProfileResponse
 import com.example.mobile.network.SitterProfileUpdateRequest
+import com.example.mobile.network.PaymentCheckoutRequest
+import com.example.mobile.network.PaymentCheckoutResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -72,6 +74,12 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Body request: CreateBookingRequest
     ): Response<Booking>
+
+    @POST("api/payments/paymongo/checkout")
+    suspend fun createPaymentCheckout(
+        @Header("Authorization") token: String,
+        @Body request: PaymentCheckoutRequest
+    ): Response<PaymentCheckoutResponse>
 
     @PUT("api/bookings/{bookingId}/owner-status")
     suspend fun updateOwnerBookingStatus(

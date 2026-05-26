@@ -70,6 +70,18 @@
         <activity
             android:name=".features.bookings.CreateBookingActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".features.payments.PaymentWebViewActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".features.payments.PaymentSuccessActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".features.payments.PaymentCancelActivity"
+            android:exported="false" />
         
     </application>
 

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/bg_app_motif">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Payment Successful"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:textColor="@color/gray_dark"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your booking payment was completed."
+            android:textSize="14sp"
+            android:textColor="@color/gray_text"
+            android:layout_marginBottom="24dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPaymentSuccessBack"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:text="Back to Dashboard"
+            android:textStyle="bold"
+            android:textColor="@color/gray_dark"
+            android:background="@drawable/bg_button_peach" />
+    </LinearLayout>
+
+</ScrollView>
