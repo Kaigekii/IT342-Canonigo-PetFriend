@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+function buildImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${API_BASE}${url}`;
+  return url;
+}
+
 const styles = {
   page: { minHeight: "100vh", backgroundColor: "#FFF8F0", color: "#333333" },
   topBar: {
@@ -157,6 +164,9 @@ const styles = {
     height: 64,
     borderRadius: "50%",
     backgroundColor: "#D3D3D3",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
   },
   sitterName: { fontSize: 30, fontWeight: 800, lineHeight: 1, marginBottom: 8 },
   sitterBio: { fontSize: 18, color: "#606060", fontWeight: 600, marginBottom: 6 },
@@ -208,6 +218,7 @@ export default function FindSitterPage() {
   const [location, setLocation] = useState("");
   const [serviceType, setServiceType] = useState("ALL");
   const [sitters, setSitters] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState("");
@@ -240,6 +251,8 @@ export default function FindSitterPage() {
     if (me?.role !== "PET_OWNER") {
       throw new Error("Pet owner access required");
     }
+
+    setUser(me);
 
     return true;
   }, [router]);
@@ -316,7 +329,15 @@ export default function FindSitterPage() {
           <span style={styles.topRightRole}>Pet Owner</span>
           <button
             type="button"
-            style={styles.avatarButton}
+            style={{
+              ...styles.avatarButton,
+              backgroundImage: user?.profilePhotoUrl ? `url(${buildImageUrl(user.profilePhotoUrl)})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundColor: user?.profilePhotoUrl ? "transparent" : styles.avatarButton.backgroundColor,
+              border: user?.profilePhotoUrl ? "none" : styles.avatarButton.border,
+            }}
             aria-label="Open profile menu"
             onClick={() => setShowProfileMenu((prev) => !prev)}
           />
@@ -376,7 +397,12 @@ export default function FindSitterPage() {
                 style={styles.sitterCard}
                 onClick={() => router.push(`/petowner/find-sitter/${sitter.sitterId}`)}
               >
-                <div style={styles.sitterAvatar} />
+                <div
+                  style={{
+                    ...styles.sitterAvatar,
+                    backgroundImage: sitter.profilePhotoUrl ? `url(${buildImageUrl(sitter.profilePhotoUrl)})` : undefined,
+                  }}
+                />
                 <div>
                   <div style={styles.sitterName}>{sitter.fullName}</div>
                   <div style={styles.sitterBio}>{sitter.bio || sitter.experience || "Pet care enthusiast"}</div>

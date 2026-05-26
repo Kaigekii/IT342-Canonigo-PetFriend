@@ -16,6 +16,7 @@ public class SitterDtos {
     public static class SitterSummaryResponse {
         private final UUID sitterId;
         private final String fullName;
+        private final String profilePhotoUrl;
         private final String bio;
         private final String experience;
         private final BigDecimal hourlyRate;
@@ -25,11 +26,12 @@ public class SitterDtos {
         private final boolean verified;
         private final String location;
 
-        public SitterSummaryResponse(UUID sitterId, String fullName, String bio, String experience,
+        public SitterSummaryResponse(UUID sitterId, String fullName, String profilePhotoUrl, String bio, String experience,
                                      BigDecimal hourlyRate, List<String> servicesOffered,
                                      BigDecimal rating, long reviewCount, boolean verified, String location) {
             this.sitterId = sitterId;
             this.fullName = fullName;
+            this.profilePhotoUrl = profilePhotoUrl;
             this.bio = bio;
             this.experience = experience;
             this.hourlyRate = hourlyRate;
@@ -42,6 +44,7 @@ public class SitterDtos {
 
         public UUID getSitterId() { return sitterId; }
         public String getFullName() { return fullName; }
+        public String getProfilePhotoUrl() { return profilePhotoUrl; }
         public String getBio() { return bio; }
         public String getExperience() { return experience; }
         public BigDecimal getHourlyRate() { return hourlyRate; }
@@ -58,6 +61,7 @@ public class SitterDtos {
     public static class SitterDetailResponse {
         private final UUID sitterId;
         private final String fullName;
+        private final String profilePhotoUrl;
         private final String bio;
         private final String experience;
         private final BigDecimal hourlyRate;
@@ -68,13 +72,14 @@ public class SitterDtos {
         private final long reviewCount;
         private final boolean verified;
         private final List<ReviewItem> reviews;
-        public SitterDetailResponse(UUID sitterId, String fullName, String bio, String experience,
+        public SitterDetailResponse(UUID sitterId, String fullName, String profilePhotoUrl, String bio, String experience,
                                     BigDecimal hourlyRate, List<String> servicesOffered, String location,
                                     Map<String, DayAvailability> availabilitySchedule,
                                     BigDecimal rating, long reviewCount, boolean verified,
                                     List<ReviewItem> reviews) {
             this.sitterId = sitterId;
             this.fullName = fullName;
+            this.profilePhotoUrl = profilePhotoUrl;
             this.bio = bio;
             this.experience = experience;
             this.hourlyRate = hourlyRate;
@@ -89,6 +94,7 @@ public class SitterDtos {
 
         public UUID getSitterId() { return sitterId; }
         public String getFullName() { return fullName; }
+        public String getProfilePhotoUrl() { return profilePhotoUrl; }
         public String getBio() { return bio; }
         public String getExperience() { return experience; }
         public BigDecimal getHourlyRate() { return hourlyRate; }

@@ -60,6 +60,15 @@ public class Booking {
     @Column(length = 10)
     private String currency = "PHP";
 
+    @Column(length = 32)
+    private String paymentProvider;
+
+    @Column(length = 120)
+    private String paymentId;
+
+    @Column(length = 20)
+    private String paymentStatus = "PENDING";
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -168,6 +177,30 @@ public class Booking {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public String getPaymentProvider() {
+        return paymentProvider;
+    }
+
+    public void setPaymentProvider(String paymentProvider) {
+        this.paymentProvider = paymentProvider;
+    }
+
+    public String getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(String paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public Instant getCreatedAt() {

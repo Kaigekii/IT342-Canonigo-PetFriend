@@ -123,6 +123,7 @@ public class BookingDtos {
         private UUID bookingId;
         private UUID ownerId;
         private String ownerName;
+        private String ownerProfilePhotoUrl;
         private UUID sitterId;
         private String sitterName;
         private String sitterProfilePhotoUrl;
@@ -135,12 +136,15 @@ public class BookingDtos {
         private List<UUID> petIds;
         private BigDecimal totalAmount;
         private String currency;
+        private String paymentId;
+        private String paymentStatus;
 
         public static BookingResponse from(edu.cit.canonigo.petfriend.model.Booking booking) {
             BookingResponse r = new BookingResponse();
             r.bookingId = booking.getBookingId();
             r.ownerId = booking.getOwner().getUserId();
             r.ownerName = booking.getOwner().getFirstName() + " " + booking.getOwner().getLastName();
+            r.ownerProfilePhotoUrl = booking.getOwner().getProfilePhotoUrl();
             r.sitterId = booking.getSitter() != null ? booking.getSitter().getUserId() : null;
             r.sitterName = booking.getSitter() != null
                     ? booking.getSitter().getFirstName() + " " + booking.getSitter().getLastName()
@@ -155,6 +159,8 @@ public class BookingDtos {
             r.petIds = booking.getPets().stream().map(Pet::getPetId).toList();
             r.totalAmount = booking.getTotalAmount();
             r.currency = booking.getCurrency();
+            r.paymentId = booking.getPaymentId();
+            r.paymentStatus = booking.getPaymentStatus();
             return r;
         }
 
@@ -169,6 +175,10 @@ public class BookingDtos {
 
         public String getOwnerName() {
             return ownerName;
+        }
+
+        public String getOwnerProfilePhotoUrl() {
+            return ownerProfilePhotoUrl;
         }
 
         public UUID getSitterId() {
@@ -217,6 +227,14 @@ public class BookingDtos {
 
         public String getCurrency() {
             return currency;
+        }
+
+        public String getPaymentId() {
+            return paymentId;
+        }
+
+        public String getPaymentStatus() {
+            return paymentStatus;
         }
     }
 }

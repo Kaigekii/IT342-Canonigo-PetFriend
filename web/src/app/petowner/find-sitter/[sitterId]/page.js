@@ -5,6 +5,13 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+function buildImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${API_BASE}${url}`;
+  return url;
+}
+
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
 const styles = {
@@ -108,7 +115,15 @@ const styles = {
     alignItems: "start",
     marginBottom: 14,
   },
-  sitterAvatar: { width: 88, height: 88, borderRadius: "50%", backgroundColor: "#D3D3D3" },
+  sitterAvatar: {
+    width: 88,
+    height: 88,
+    borderRadius: "50%",
+    backgroundColor: "#D3D3D3",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  },
   sitterName: { fontSize: 44, fontWeight: 800, lineHeight: 1, marginBottom: 10 },
   sitterBio: { fontSize: 20, color: "#5A5A5A", fontWeight: 600, marginBottom: 10 },
   ratingRow: { display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" },
@@ -300,6 +315,7 @@ export default function SitterDetailPage() {
 
   const [sitter, setSitter] = useState(null);
   const [pets, setPets] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -345,6 +361,8 @@ export default function SitterDetailPage() {
     if (me?.role !== "PET_OWNER") {
       throw new Error("Pet owner access required");
     }
+
+    setUser(me);
 
     return true;
   }, [router]);
@@ -471,7 +489,28 @@ export default function SitterDetailPage() {
         throw new Error(msg || "Failed to create booking");
       }
 
-      setSuccess("Booking created successfully. Payment is simulated in sandbox mode.");
+      const booking = await res.json();
+
+      const payRes = await fetch(`${API_BASE}/api/payments/paymongo/checkout`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookingId: booking.bookingId }),
+      });
+
+      if (!payRes.ok) {
+        const msg = await payRes.text();
+        throw new Error(msg || "Failed to start payment");
+      }
+
+      const payData = await payRes.json();
+      if (typeof window !== "undefined") {
+        localStorage.setItem("paymongoReturnUrl", window.location.pathname);
+      }
+      setSuccess("Redirecting to PayMongo checkout...");
+      window.location.href = payData.checkoutUrl;
     } catch (err) {
       setError(err?.message || "Unable to create booking.");
     } finally {
@@ -549,7 +588,15 @@ export default function SitterDetailPage() {
           <span style={styles.topRightRole}>Pet Owner</span>
           <button
             type="button"
-            style={styles.avatarButton}
+            style={{
+              ...styles.avatarButton,
+              backgroundImage: user?.profilePhotoUrl ? `url(${buildImageUrl(user.profilePhotoUrl)})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundColor: user?.profilePhotoUrl ? "transparent" : styles.avatarButton.backgroundColor,
+              border: user?.profilePhotoUrl ? "none" : styles.avatarButton.border,
+            }}
             aria-label="Open profile menu"
             onClick={() => setShowProfileMenu((prev) => !prev)}
           />
@@ -576,7 +623,12 @@ export default function SitterDetailPage() {
         ) : (
           <>
             <section style={styles.topPanel}>
-              <div style={styles.sitterAvatar} />
+              <div
+                style={{
+                  ...styles.sitterAvatar,
+                  backgroundImage: sitter?.profilePhotoUrl ? `url(${buildImageUrl(sitter.profilePhotoUrl)})` : undefined,
+                }}
+              />
               <div>
                 <h1 style={styles.sitterName}>{sitter.fullName}</h1>
                 <p style={styles.sitterBio}>{sitter.bio || "Loves dogs and cats."}</p>

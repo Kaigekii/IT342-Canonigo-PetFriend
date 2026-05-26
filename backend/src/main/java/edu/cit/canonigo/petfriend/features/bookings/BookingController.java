@@ -67,6 +67,31 @@ public class BookingController {
     }
 
     /**
+     * GET /api/bookings/{bookingId} - Get booking details for authenticated owner.
+     */
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<?> getOwnerBooking(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable UUID bookingId
+    ) {
+        User owner = getAuthenticatedUser(userDetails);
+        if (owner == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if (owner.getRole() != UserRole.PET_OWNER) {
+            return ResponseEntity.status(403).body("Only pet owners can view their bookings");
+        }
+
+        try {
+            Booking booking = bookingService.getOwnerBooking(owner.getUserId(), bookingId);
+            return ResponseEntity.ok(BookingDtos.BookingResponse.from(booking));
+        } catch (BookingException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
      * POST /api/bookings - Create a new booking request.
      */
     @PostMapping

@@ -555,6 +555,9 @@ export default function PetSitterMessagesPage() {
               backgroundImage: user?.profilePhotoUrl ? `url(${buildImageUrl(user.profilePhotoUrl)})` : undefined,
               backgroundSize: "cover",
               backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundColor: user?.profilePhotoUrl ? "transparent" : styles.avatarButton.backgroundColor,
+              border: user?.profilePhotoUrl ? "none" : styles.avatarButton.border,
             }}
             aria-label="Open profile menu"
             onClick={() => setShowProfileMenu((prev) => !prev)}

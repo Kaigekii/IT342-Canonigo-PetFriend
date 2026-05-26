@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+function buildImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${API_BASE}${url}`;
+  return url;
+}
+
 const STATUS_TABS = [
   { key: "ALL", label: "All" },
   { key: "UPCOMING", label: "Upcoming" },
@@ -164,11 +171,12 @@ const styles = {
     borderRadius: 8,
     backgroundColor: "#FFF8F0",
     boxShadow: "0px 2px 6px rgba(0,0,0,0.05)",
+    width: "100%",
     overflow: "hidden",
   },
   tableHeader: {
     display: "grid",
-    gridTemplateColumns: "120px 180px 120px 120px 160px 110px 120px 80px",
+    gridTemplateColumns: "140px 1.2fr 1fr 1fr 1.4fr 0.9fr 1.6fr 1.2fr 90px",
     padding: "12px 16px",
     backgroundColor: "#F2F2F2",
     borderBottom: "1px solid #D3D3D3",
@@ -180,7 +188,7 @@ const styles = {
   },
   tableRow: {
     display: "grid",
-    gridTemplateColumns: "120px 180px 120px 120px 160px 110px 120px 80px",
+    gridTemplateColumns: "140px 1.2fr 1fr 1fr 1.4fr 0.9fr 1.6fr 1.2fr 90px",
     padding: "14px 16px",
     alignItems: "center",
     borderBottom: "1px solid #D3D3D3",
@@ -191,6 +199,21 @@ const styles = {
   },
   cellStrong: {
     fontWeight: 700,
+  },
+  sitterCell: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+  },
+  sitterAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: "50%",
+    backgroundColor: "#D3D3D3",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    flexShrink: 0,
   },
   dateCell: {
     display: "flex",
@@ -211,6 +234,7 @@ const styles = {
     border: "1px solid #D3D3D3",
     textAlign: "center",
     width: "fit-content",
+    whiteSpace: "nowrap",
   },
   statusPending: {
     backgroundColor: "#FFF9C4",
@@ -237,6 +261,12 @@ const styles = {
     fontWeight: 700,
     cursor: "pointer",
     padding: 0,
+  },
+  actionCell: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
   },
   actionMuted: {
     color: "#B0B0B0",
@@ -318,6 +348,7 @@ export default function PetOwnerBookingsPage() {
 
   const [bookings, setBookings] = useState([]);
   const [reviewedBookingIds, setReviewedBookingIds] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -341,6 +372,8 @@ export default function PetOwnerBookingsPage() {
       router.replace("/dashboard");
       return;
     }
+
+    setUser(me);
 
     const [bookingsRes, reviewedRes] = await Promise.all([
       fetch(`${API_BASE}/api/bookings`, { headers }),
@@ -463,7 +496,15 @@ export default function PetOwnerBookingsPage() {
           <span style={styles.topRightRole}>Pet Owner</span>
           <button
             type="button"
-            style={styles.avatarButton}
+            style={{
+              ...styles.avatarButton,
+              backgroundImage: user?.profilePhotoUrl ? `url(${buildImageUrl(user.profilePhotoUrl)})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundColor: user?.profilePhotoUrl ? "transparent" : styles.avatarButton.backgroundColor,
+              border: user?.profilePhotoUrl ? "none" : styles.avatarButton.border,
+            }}
             aria-label="Open profile menu"
             onClick={() => setShowProfileMenu((prev) => !prev)}
           />
@@ -520,6 +561,7 @@ export default function PetOwnerBookingsPage() {
               <div>Service</div>
               <div>Date/Time</div>
               <div>Amount</div>
+              <div>Payment ID</div>
               <div>Status</div>
               <div />
             </div>
@@ -537,7 +579,17 @@ export default function PetOwnerBookingsPage() {
                   }}
                 >
                   <div>{booking.bookingId ? `bk_${String(booking.bookingId).slice(0, 5)}` : "-"}</div>
-                  <div style={styles.cellStrong}>{booking.sitterName || "Pending Sitter"}</div>
+                  <div style={styles.sitterCell}>
+                    <div
+                      style={{
+                        ...styles.sitterAvatar,
+                        backgroundImage: booking.sitterProfilePhotoUrl
+                          ? `url(${buildImageUrl(booking.sitterProfilePhotoUrl)})`
+                          : undefined,
+                      }}
+                    />
+                    <span style={styles.cellStrong}>{booking.sitterName || "Pending Sitter"}</span>
+                  </div>
                   <div>{booking.petNames?.[0] || "Pet"}</div>
                   <div>{String(booking.serviceType || "SERVICE").toLowerCase()}</div>
                   <div style={styles.dateCell}>
@@ -545,10 +597,18 @@ export default function PetOwnerBookingsPage() {
                     <span>{formatTime(booking.startTime)}-{formatTime(booking.endTime)}</span>
                   </div>
                   <div style={styles.amount}>{formatMoney(booking.totalAmount, booking.currency)}</div>
+                  <div>{booking.paymentId || "-"}</div>
                   <div>
                     <span style={getStatusStyle(booking.status)}>{booking.status || ""}</span>
                   </div>
-                  <div>
+                  <div style={styles.actionCell}>
+                    <button
+                      type="button"
+                      style={styles.actionLink}
+                      onClick={() => router.push(`/petowner/bookings/${booking.bookingId}`)}
+                    >
+                      Details
+                    </button>
                     {showCancel && (
                       <button type="button" style={styles.actionLink} onClick={() => handleCancel(booking.bookingId)} disabled={saving}>
                         Cancel

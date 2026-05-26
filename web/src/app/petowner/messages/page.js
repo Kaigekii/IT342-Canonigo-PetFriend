@@ -299,6 +299,7 @@ export default function PetOwnerMessagesPage() {
   }, []);
 
   const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -326,6 +327,7 @@ export default function PetOwnerMessagesPage() {
       return;
     }
 
+    setUser(me);
     setUserId(me.userId);
 
     const [bookingsRes, threadsRes] = await Promise.all([
@@ -553,7 +555,15 @@ export default function PetOwnerMessagesPage() {
           <span style={styles.topRightRole}>Pet Owner</span>
           <button
             type="button"
-            style={styles.avatarButton}
+            style={{
+              ...styles.avatarButton,
+              backgroundImage: user?.profilePhotoUrl ? `url(${buildImageUrl(user.profilePhotoUrl)})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundColor: user?.profilePhotoUrl ? "transparent" : styles.avatarButton.backgroundColor,
+              border: user?.profilePhotoUrl ? "none" : styles.avatarButton.border,
+            }}
             aria-label="Open profile menu"
             onClick={() => setShowProfileMenu((prev) => !prev)}
           />

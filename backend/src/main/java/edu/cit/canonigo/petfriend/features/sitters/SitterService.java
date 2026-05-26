@@ -76,6 +76,7 @@ public class SitterService {
             results.add(new SitterDtos.SitterSummaryResponse(
                     sitter.getUserId(),
                     safeName(sitter),
+                    sitter.getProfilePhotoUrl(),
                     profile.getBio(),
                     profile.getExperience(),
                     profile.getHourlyRate(),
@@ -112,6 +113,7 @@ public class SitterService {
         return new SitterDtos.SitterDetailResponse(
                 sitter.getUserId(),
                 safeName(sitter),
+            sitter.getProfilePhotoUrl(),
                 profile.getBio(),
                 profile.getExperience(),
                 profile.getHourlyRate(),

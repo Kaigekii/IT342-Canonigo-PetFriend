@@ -222,6 +222,40 @@ public class BookingService {
     }
 
     /**
+     * Get a single booking for the authenticated owner.
+     */
+    public Booking getOwnerBooking(UUID ownerId, UUID bookingId) throws BookingException {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingException("Booking not found"));
+
+        if (booking.getOwner() == null || !booking.getOwner().getUserId().equals(ownerId)) {
+            throw new BookingException("You are not authorized to view this booking");
+        }
+
+        return booking;
+    }
+
+    /**
+     * Update payment details on a booking.
+     */
+    public Booking updatePayment(UUID bookingId, String paymentProvider, String paymentId, String paymentStatus) throws BookingException {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingException("Booking not found"));
+
+        if (paymentProvider != null && !paymentProvider.isBlank()) {
+            booking.setPaymentProvider(paymentProvider);
+        }
+        if (paymentId != null && !paymentId.isBlank()) {
+            booking.setPaymentId(paymentId);
+        }
+        if (paymentStatus != null && !paymentStatus.isBlank()) {
+            booking.setPaymentStatus(paymentStatus);
+        }
+
+        return bookingRepository.save(booking);
+    }
+
+    /**
      * Calculate total amount including service fee.
      * Formula: baseAmount = hourlyRate * durationHours, serviceFee = 10% of baseAmount, total = baseAmount + serviceFee
      */

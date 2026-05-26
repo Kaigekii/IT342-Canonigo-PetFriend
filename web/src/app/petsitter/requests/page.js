@@ -185,6 +185,9 @@ const styles = {
     height: 44,
     borderRadius: "50%",
     backgroundColor: "#D3D3D3",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
   },
   rowName: {
     fontSize: 18,
@@ -469,6 +472,9 @@ export default function PetSitterRequestsPage() {
               backgroundImage: user?.profilePhotoUrl ? `url(${buildImageUrl(user.profilePhotoUrl)})` : undefined,
               backgroundSize: "cover",
               backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundColor: user?.profilePhotoUrl ? "transparent" : styles.avatarButton.backgroundColor,
+              border: user?.profilePhotoUrl ? "none" : styles.avatarButton.border,
             }}
             aria-label="Open profile menu"
             onClick={() => setShowProfileMenu((prev) => !prev)}
@@ -512,7 +518,14 @@ export default function PetSitterRequestsPage() {
           ) : (
             filteredRequests.map((request) => (
               <div key={request.bookingId} style={styles.rowCard}>
-                <div style={styles.rowAvatar} />
+                <div
+                  style={{
+                    ...styles.rowAvatar,
+                    backgroundImage: request.ownerProfilePhotoUrl
+                      ? `url(${buildImageUrl(request.ownerProfilePhotoUrl)})`
+                      : undefined,
+                  }}
+                />
                 <div>
                   <div style={styles.rowName}>{request.ownerName || "Pet Owner"}</div>
                   <div style={styles.rowMeta}>
