@@ -27,6 +27,20 @@ data class AuthResponse(
     val isVerified: Boolean? = null
 )
 
+data class GoogleAuthRequest(
+    val token: String,
+    val role: String? = null
+)
+
+data class SupabaseTokenRequest(
+    val provider: String,
+    val id_token: String
+)
+
+data class SupabaseTokenResponse(
+    val access_token: String?
+)
+
 data class UserProfileResponse(
     val userId: String,
     val firstName: String,

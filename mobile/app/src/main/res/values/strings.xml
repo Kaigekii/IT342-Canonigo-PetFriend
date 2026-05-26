@@ -30,4 +30,10 @@
     <string name="hint_age">Age (Optional)</string>
     <string name="hint_gender">Gender (Optional)</string>
     <string name="hint_address">Address (Optional)</string>
+
+    <!-- Google OAuth (Mobile) -->
+    <string name="google_sign_in">Continue with Google</string>
+    <string name="google_web_client_id">208399449729-i11gel6s8r2jbl32j85deev87l7592nm.apps.googleusercontent.com</string>
+    <string name="supabase_url">https://vroxcnhnjjkolqubnpot.supabase.co</string>
+    <string name="supabase_anon_key">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyb3hjbmhuamprb2xxdWJucG90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjA2NDEsImV4cCI6MjA4ODM5NjY0MX0.m1rm2DHmjIMTJvlI_FDXkwqsyRI-VZwUhUbnHwp5jME</string>
 </resources>
