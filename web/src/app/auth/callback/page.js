@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/shared/utils/supabaseClient";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
 export default function AuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -28,7 +30,7 @@ export default function AuthCallbackPage() {
         setStatus(role ? `Setting up your ${role.replace("_", " ")} account...` : "Signing you in...");
 
         // Exchange the Supabase token for a PetFriend JWT
-        const res = await fetch("http://localhost:8080/api/auth/google", {
+        const res = await fetch(`${API_BASE}/api/auth/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token: accessToken, role }),

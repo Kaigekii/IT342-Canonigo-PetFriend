@@ -308,35 +308,36 @@ Critical actions (booking, payment) must include confirmation dialogs to prevent
 
 4.0 SYSTEM ARCHITECTURE
 4.1 Component Diagram
-Note: This should be a component diagram
+Note: A three-tier architecture is used: mobile and web clients → backend API (Spring Boot) → PostgreSQL. External integrations include Supabase (OAuth token exchange), PayMongo (sandbox checkout + webhook), and an SMTP provider for email.
 
-
-
-Technology Stack
+Technology Stack (project-specific)
 Backend
-Java 17
-Spring Boot 3.x
-Spring Security (authentication & authorization)
-Spring Data JPA / Hibernate (ORM and database operations)
-JWT (Java JWT library) for stateless token-based authentication
+- Java 17
+- Spring Boot 3.5.x (the repository uses Spring Boot 3.5.11)
+- Spring Security with JWT for authentication and role-based access control
+- Spring Data JPA / Hibernate (ORM)
+- RestTemplate / WebClient for PayMongo and Supabase HTTP calls
 Database
-PostgreSQL 14+
+- PostgreSQL 14+
 Web Frontend
-React 18
-JavaScript
-Axios (HTTP client for API calls)
-Tailwind CSS (utility-first styling framework)
+- Next.js (App Router) 16.1.6
+- React 19
+- Native Next/Fetch for API calls
+- Tailwind CSS and custom styles
 Mobile
-Kotlin (Android app development)
-Infrastructure
-Railway or Render (backend hosting)
+- Android (Kotlin)
+- Retrofit + OkHttp for HTTP calls
+- Coroutines for asynchronous work
+- Google Sign-In (requestIdToken) integrated with Supabase exchange
+Infrastructure & Hosting
+- Web: Vercel (recommended in repo README)
+- Backend: Railway / Render / any host supporting Java 17
+- Mobile: APK distribution / Play Store (optional)
 
-Frontend Hosting
-Vercel, Netlify, or Render (web application hosting)
-APK distribution (Android mobile app)
-Third-Party Integrations
-Stripe or PayPal Sandbox (payment processing in test mode)
-SendGrid or Mailgun (email notifications for booking confirmations)
+Third-Party Integrations (actual project choices)
+- PayMongo (sandbox) — checkout session creation + webhook-based payment status updates. Backend stores `paymentId` and updates booking/payment records on webhook events.
+- Supabase Auth — used as a Google OAuth token-exchange helper for mobile Google Sign-In flows. The backend validates or exchanges Supabase-provided tokens and issues application JWTs.
+- SMTP provider (SendGrid/Mailgun) — used to send welcome and booking emails from backend.
 
 5.0 API CONTRACT & COMMUNICATION
 5.1 API Standards
@@ -366,873 +367,81 @@ Error Response Structure:
   "timestamp": "2026-02-28T14:30:00Z"
 }
 
-5.2 Endpoint Specifications
-Authentication Endpoints
-Endpoint: POST /auth/register
-Method: POST
-Description: Create new user account
-Auth Required: No
-Request Body:
-{
-  "email": "user@university.edu",
-  "password": "StrongPass123!",
-  "fullName": "Maria Santos",
-  "role": "PET_OWNER"
-}
-Success Response (201 Created):
-{
-  "success": true,
-  "data": {
-	"user": {
-  	"id": "usr_12345",
-      "email": "user@university.edu",
-      "fullName": "Maria Santos",
-      "role": "PET_OWNER",
-      "createdAt": "2026-02-28T14:30:00Z"
-	},
-	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refreshToken": "rt_abc123xyz789"
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
+5.2 Endpoint Specifications (key endpoints used in project)
+All endpoints in the running application are prefixed with `/api`.
 
-Endpoint: POST /auth/login
-Method: POST
-Description: Authenticate user credentials
-Auth Required: No
-Request Body:
-{
-  "email": "user@university.edu",
-  "password": "StrongPass123!"
-}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-	"user": {
-  	"id": "usr_12345",
-      "email": "user@university.edu",
-      "fullName": "Maria Santos",
-      "role": "PET_OWNER",
-      "profileCompleted": false
-	},
-	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refreshToken": "rt_abc123xyz789"
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
+Authentication
+- POST /api/auth/register — register with email/password (returns application JWT)
+- POST /api/auth/login — login with email/password (returns application JWT)
+- POST /api/auth/logout — revoke refresh token / logout
+- POST /api/auth/refresh — refresh access token
+- POST /api/auth/google — backend endpoint used after Supabase Google token exchange; accepts a Supabase access token or id_token, validates/exchanges it and returns application JWT
 
-Endpoint: POST /auth/logout
-Method: POST
-Description: Invalidate current session
- Auth Required: Yes
-Headers: Authorization: Bearer {token}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "message": "Logged out successfully"
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
+Uploads / Media
+- POST /api/uploads/users/{userId}/photo — upload user profile photo (multipart/form-data)
+- POST /api/uploads/pets/{petId}/photo — upload pet photo
 
-Endpoint: POST /auth/refresh
-Method: POST
-Description: Refresh expired JWT token
-Auth Required: Yes (refresh token)
-Request Body:
-{
-  "refreshToken": "rt_abc123xyz789"
-}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refreshToken": "rt_newtoken789"
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
+Pets
+- GET /api/pets
+- POST /api/pets
+- GET /api/pets/{petId}
+- PUT /api/pets/{petId}
+- DELETE /api/pets/{petId}
 
-User Profile Endpoints
-Endpoint: GET /users/me
-Method: GET
-Description: Get current user profile
-Auth Required: Yes
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-	"user": {
-  	"id": "usr_12345",
-      "email": "user@university.edu",
-      "fullName": "Maria Santos",
-      "role": "PET_OWNER",
-      "profilePhotoUrl": "https://storage.petfriend.app/photos/usr_12345.jpg",
-      "phoneNumber": "+639123456789",
-      "address": "Cebu City, Philippines",
-      "createdAt": "2026-02-28T14:30:00Z",
-      "profileCompleted": true
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
+Sitters
+- GET /api/sitters/profile
+- PUT /api/sitters/profile
+- POST /api/sitters/profile/verify
+- GET /api/sitters/search
 
-Endpoint: PUT /users/me
-Method: PUT
-Description: Update user profile
-Auth Required: Yes
-Request Body:
-{
-  "fullName": "Maria Santos",
-  "phoneNumber": "+639123456789",
-  "address": "Cebu City, Philippines"
-}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-	"user": {
-  	"id": "usr_12345",
-      "email": "user@university.edu",
-      "fullName": "Maria Santos",
-      "role": "PET_OWNER",
-      "profilePhotoUrl": "https://storage.petfriend.app/photos/usr_12345.jpg",
-      "phoneNumber": "+639123456789",
-      "address": "Cebu City, Philippines",
-      "profileCompleted": true
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
+Bookings
+- POST /api/bookings — creates booking and returns booking id + pricing
+- GET /api/bookings
+- GET /api/bookings/{bookingId}
+- POST /api/bookings/{bookingId}/cancel
+- POST /api/bookings/{bookingId}/complete
 
-Pet Profile Endpoints
-Endpoint: GET /pets
-Method: GET
-Description: List all user's pets
-Auth Required: Yes
-Query Parameters: ?page=1&limit=10
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-	"pets": [
-  	{
-        "id": "pet_67890",
-        "ownerId": "usr_12345",
-        "name": "Bantay",
-        "breed": "Aspin",
-        "age": 3,
-        "weight": 12.5,
-        "species": "DOG",
-        "specialNeeds": "Allergic to chicken",
-        "vaccinationStatus": "UP_TO_DATE",
-        "photoUrl": "https://storage.petfriend.app/pets/bantay.jpg",
-        "createdAt": "2026-02-28T14:30:00Z"
-  	}
-	],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 1,
-      "pages": 1
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
+Payments (PayMongo integration)
+- POST /api/payments/paymongo/checkout — create PayMongo checkout session. Returns `{ checkoutUrl, paymentId }`.
+- POST /api/payments/paymongo/webhook — PayMongo webhook listener. Backend validates webhook payload and updates booking/payment records.
+- GET /api/payments/{paymentId}
 
-Endpoint: POST /pets
-Method: POST
-Description: Create new pet profile
-Auth Required: Yes
-Request Body:
-{
-  "name": "Bantay",
-  "breed": "Aspin",
-  "age": 3,
-  "weight": 12.5,
-  "species": "DOG",
-  "specialNeeds": "Allergic to chicken",
-  "vaccinationStatus": "UP_TO_DATE",
-  "photoUrl": "https://storage.petfriend.app/pets/bantay.jpg"
-}
-Success Response (201 Created):
-1 {
-  "success": true,
-  "data": {
-	"pet": {
-  	"id": "pet_67890",
-      "ownerId": "usr_12345",
-      "name": "Bantay",
-      "breed": "Aspin",
-  	"age": 3,
-      "weight": 12.5,
-      "species": "DOG",
-      "specialNeeds": "Allergic to chicken",
-      "vaccinationStatus": "UP_TO_DATE",
-      "photoUrl": "https://storage.petfriend.app/pets/bantay.jpg",
-      "createdAt": "2026-02-28T14:30:00Z"
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: GET /pets/{petId}
-Method: GET
-Description: Get pet details
-Auth Required: Yes (owner only)
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-	"pet": {
-  	"id": "pet_67890",
-      "ownerId": "usr_12345",
-      "name": "Bantay",
-      "breed": "Aspin",
-  	"age": 3,
-      "weight": 12.5,
-      "species": "DOG",
-      "specialNeeds": "Allergic to chicken",
-      "vaccinationStatus": "UP_TO_DATE",
-      "photoUrl": "https://storage.petfriend.app/pets/bantay.jpg",
-      "createdAt": "2026-02-28T14:30:00Z"
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: PUT /pets/{petId}
-Method: PUT
-Description: Update pet details
-Auth Required: Yes (owner only)
-Request Body:
-{
-  "name": "Bantay",
-  "breed": "Aspin",
-  "age": 4,
-  "weight": 13.0,
-  "specialNeeds": "Allergic to chicken",
-  "vaccinationStatus": "UP_TO_DATE"
-}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-	"pet": {
-  	"id": "pet_67890",
-      "ownerId": "usr_12345",
-      "name": "Bantay",
-      "breed": "Aspin",
-  	"age": 4,
-      "weight": 13.0,
-      "species": "DOG",
-      "specialNeeds": "Allergic to chicken",
-      "vaccinationStatus": "UP_TO_DATE",
-      "photoUrl": "https://storage.petfriend.app/pets/bantay.jpg",
-      "createdAt": "2026-02-28T14:30:00Z"
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: DELETE /pets/{petId}
-Method: DELETE
-Description: Delete pet profile
-Auth Required: Yes (owner only)
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "message": "Pet deleted successfully"
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Sitter Profile Endpoints
-Endpoint: GET /sitters/profile
-Method: GET
-Description: Get sitter profile
-Auth Required: Yes (sitter role)
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "sitter": {
-  	"id": "usr_54321",
-      "userId": "usr_54321",
-  	"bio": "Biology student, loves dogs!",
-      "experience": "2 years pet sitting",
-      "hourlyRate": 150.00,
-      "currency": "PHP",
-      "servicesOffered": ["WALK", "FEEDING", "OVERNIGHT"],
-      "availability": [
-    	{ "dayOfWeek": "MONDAY", "startTime": "09:00", "endTime": "17:00" },
-    	{ "dayOfWeek": "WEDNESDAY", "startTime": "09:00", "endTime": "17:00" }
-  	],
-      "rating": 4.9,
-      "reviewCount": 24,
-      "verificationStatus": "APPROVED",
-      "profileCompleted": true
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: PUT /sitters/profile
-Method: PUT
-Description: Update sitter profile
-Auth Required: Yes (sitter role)
-Request Body:
-{
-  "bio": "Biology student, loves dogs!",
-  "experience": "2 years pet sitting",
-  "hourlyRate": 150.00,
-  "servicesOffered": ["WALK", "FEEDING", "OVERNIGHT"]
-}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "sitter": {
-  	"id": "usr_54321",
-      "userId": "usr_54321",
-  	"bio": "Biology student, loves dogs!",
-      "experience": "2 years pet sitting",
-      "hourlyRate": 150.00,
-      "currency": "PHP",
-      "servicesOffered": ["WALK", "FEEDING", "OVERNIGHT"],
-      "verificationStatus": "PENDING",
-      "profileCompleted": true
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: POST /sitters/profile/verify
-Method: POST
-Description: Submit for verification
-Auth Required: Yes (sitter role)
-Request Body:
-{
-  "studentId": "2021-12345",
-  "references": [
-	{ "name": "Prof. Juan Cruz", "contact": "prof@university.edu" }
-  ]
-}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "message": "Verification request submitted successfully",
-    "status": "PENDING"
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: GET /sitters/search
-Method: GET
-Description: Search available sitters
-Auth Required: Yes
-Query Parameters: ?date=2026-03-01&location=Cebu&serviceType=WALK&page=1&limit=10
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "sitters": [
-  	{
-        "id": "usr_54321",
-        "fullName": "Juan Dela Cruz",
-        "rating": 4.9,
-        "reviewCount": 24,
-        "hourlyRate": 150.00,
-        "currency": "PHP",
-        "bio": "Biology student, loves dogs!",
-        "profilePhotoUrl": "https://storage.petfriend.app/photos/usr_54321.jpg",
-        "availableSlots": [
-      	{ "date": "2026-03-01", "startTime": "09:00", "endTime": "12:00" },
-      	{ "date": "2026-03-01", "startTime": "14:00", "endTime": "17:00" }
-    	],
-        "servicesOffered": ["WALK", "FEEDING", "OVERNIGHT"]
-  	}
-	],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 1,
-      "pages": 1
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: GET /sitters/{sitterId}/availability
-Method: GET
-Description: Get sitter availability calendar
-Auth Required: Yes
-Query Parameters: ?startDate=2026-03-01&endDate=2026-03-07
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "sitterId": "usr_54321",
-    "availability": [
-  	{
-        "date": "2026-03-01",
-        "availableSlots": [
-      	{ "startTime": "09:00", "endTime": "12:00" },
-      	{ "startTime": "14:00", "endTime": "17:00" }
-    	]
-  	},
-  	{
-        "date": "2026-03-02",
-        "availableSlots": [
-      	{ "startTime": "10:00", "endTime": "16:00" }
-    	]
-  	}
-	]
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Booking Endpoints
-Endpoint: POST /bookings
-Method: POST
-Description: Create new booking
-Auth Required: Yes (pet owner)
-Request Body:
-{
-  "sitterId": "usr_54321",
-  "petIds": ["pet_67890"],
-  "serviceType": "WALK",
-  "date": "2026-03-01",
-  "startTime": "09:00",
-  "endTime": "10:00",
-  "specialInstructions": "Please give extra treats after walk"
-}
-Success Response (201 Created):
-{
-  "success": true,
-  "data": {
-    "booking": {
-  	"id": "bk_12345",
-      "ownerId": "usr_12345",
-      "sitterId": "usr_54321",
-      "petIds": ["pet_67890"],
-      "serviceType": "WALK",
-      "date": "2026-03-01",
-      "startTime": "09:00",
-      "endTime": "10:00",
-      "durationMinutes": 60,
-      "totalAmount": 150.00,
-      "currency": "PHP",
-      "status": "CONFIRMED",
-      "specialInstructions": "Please give extra treats after walk",
-      "createdAt": "2026-02-28T14:30:00Z"
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: GET /bookings
-Method: GET
-Description: List user's bookings
-Auth Required: Yes
-Query Parameters: ?status=CONFIRMED&page=1&limit=10
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "bookings": [
-  	{
-        "id": "bk_12345",
-        "ownerId": "usr_12345",
-        "sitterId": "usr_54321",
-        "petIds": ["pet_67890"],
-        "serviceType": "WALK",
-        "date": "2026-03-01",
-        "startTime": "09:00",
-        "endTime": "10:00",
-        "totalAmount": 150.00,
-        "currency": "PHP",
-        "status": "CONFIRMED",
-        "createdAt": "2026-02-28T14:30:00Z"
-  	}
-	],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 1,
-      "pages": 1
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: GET /bookings/{bookingId}
-Method: GET
-Description: Get booking details
-Auth Required: Yes (owner or sitter)
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "booking": {
-  	"id": "bk_12345",
-      "ownerId": "usr_12345",
-      "sitterId": "usr_54321",
-      "petIds": ["pet_67890"],
-      "serviceType": "WALK",
-      "date": "2026-03-01",
-      "startTime": "09:00",
-      "endTime": "10:00",
-      "durationMinutes": 60,
-      "totalAmount": 150.00,
-      "currency": "PHP",
-      "status": "CONFIRMED",
-      "specialInstructions": "Please give extra treats after walk",
-      "createdAt": "2026-02-28T14:30:00Z",
-      "completedAt": null
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: POST /bookings/{bookingId}/cancel
-Method: POST
-Description: Cancel booking
-Auth Required: Yes (owner or sitter)
-Request Body:
-{
-  "reason": "Schedule conflict"
-}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "booking": {
-  	"id": "bk_12345",
-      "status": "CANCELLED",
-      "cancelledAt": "2026-02-28T15:00:00Z",
-      "cancellationReason": "Schedule conflict"
-	}
-  },
-  "timestamp": "2026-02-28T15:00:00Z"
-}
-
-Endpoint: POST /bookings/{bookingId}/complete
-Method: POST
-Description: Mark booking as complete
-Auth Required: Yes (sitter)
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "booking": {
-  	"id": "bk_12345",
-      "status": "COMPLETED",
-      "completedAt": "2026-03-01T10:05:00Z"
-	}
-  },
-  "timestamp": "2026-03-01T10:05:00Z"
-}
-
-Payment Endpoints
-Endpoint: POST /payments/process
-Method: POST
-Description: Process payment for booking
-Auth Required: Yes (pet owner)
-Request Body:
-{
-  "bookingId": "bk_12345",
-  "paymentMethod": "CARD",
-  "cardToken": "tok_visa_4242"
-}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "payment": {
-  	"id": "pay_67890",
-      "bookingId": "bk_12345",
-      "amount": 150.00,
-      "currency": "PHP",
-      "status": "COMPLETED",
-      "paymentMethod": "VISA **** 4242",
-      "platformFee": 15.00,
-      "sitterPayout": 135.00,
-      "completedAt": "2026-02-28T14:35:00Z"
-	}
-  },
-  "timestamp": "2026-02-28T14:35:00Z"
-}
-
-Endpoint: GET /payments/{paymentId}
-Method: GET
-Description: Get payment details
-Auth Required: Yes (owner or sitter)
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "payment": {
-  	"id": "pay_67890",
-      "bookingId": "bk_12345",
-      "amount": 150.00,
-      "currency": "PHP",
-      "status": "COMPLETED",
-      "paymentMethod": "VISA **** 4242",
-      "platformFee": 15.00,
-      "sitterPayout": 135.00,
-      "completedAt": "2026-02-28T14:35:00Z"
-	}
-  },
-  "timestamp": "2026-02-28T14:35:00Z"
-}
-
-Review Endpoints
-Endpoint: POST /reviews
-Method: POST
-Description: Submit review for sitter
-Auth Required: Yes (after booking completion)
-Request Body:
-{
-  "bookingId": "bk_12345",
-  "rating": 5,
-  "communication": 5,
-  "reliability": 5,
-  "petCareQuality": 5,
-  "comment": "Juan was amazing with Bantay! Very responsible and sent photos during the walk."
-}
-Success Response (201 Created):
-{
-  "success": true,
-  "data": {
-    "review": {
-  	"id": "rev_54321",
-      "bookingId": "bk_12345",
-      "sitterId": "usr_54321",
-      "reviewerId": "usr_12345",
-      "rating": 5,
-      "communication": 5,
-      "reliability": 5,
-      "petCareQuality": 5,
-      "comment": "Juan was amazing with Bantay! Very responsible and sent photos during the walk.",
-      "createdAt": "2026-03-01T11:00:00Z"
-	}
-  },
-  "timestamp": "2026-03-01T11:00:00Z"
-}
-
-Endpoint: GET /sitters/{sitterId}/reviews
-Method: GET
-Description: Get sitter's reviews
-Auth Required: Yes
-Query Parameters: ?page=1&limit=10
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "reviews": [
-  	{
-        "id": "rev_54321",
-        "bookingId": "bk_12345",
-        "sitterId": "usr_54321",
-        "reviewerName": "Maria Santos",
-        "rating": 5,
-        "communication": 5,
-        "reliability": 5,
-        "petCareQuality": 5,
-        "comment": "Juan was amazing with Bantay! Very responsible and sent photos during the walk.",
-        "createdAt": "2026-03-01T11:00:00Z"
-  	}
-	],
-    "averageRating": 4.9,
-    "totalReviews": 24,
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 24,
-      "pages": 3
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Admin Endpoints
-Endpoint: GET /admin/sitters/pending
-Method: GET
-Description: List pending sitter applications
-Auth Required: Yes (admin role)
-Query Parameters: ?page=1&limit=10
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "applications": [
-  	{
-        "id": "usr_98765",
-        "fullName": "Ana Reyes",
-        "email": "ana@university.edu",
-        "bio": "Veterinary student with 1 year experience",
-        "hourlyRate": 120.00,
-        "servicesOffered": ["WALK", "FEEDING"],
-        "studentId": "2022-54321",
-        "submittedAt": "2026-02-27T10:00:00Z"
-  	}
-	],
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 1,
-      "pages": 1
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: POST /admin/sitters/{sitterId}/approve
-Method: POST
-Description: Approve sitter application
-Auth Required: Yes (admin role)
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "message": "Sitter application approved successfully",
-    "sitterId": "usr_98765",
-    "status": "APPROVED"
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: POST /admin/sitters/{sitterId}/reject
-Method: POST
-Description: Reject sitter application
-Auth Required: Yes (admin role)
-Request Body:
-{
-  "reason": "Incomplete documentation"
-}
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-    "message": "Sitter application rejected",
-    "sitterId": "usr_98765",
-    "status": "REJECTED",
-    "reason": "Incomplete documentation"
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
-
-Endpoint: GET /admin/users
-Method: GET
-Description: List all users
-Auth Required: Yes (admin role)
-Query Parameters: ?role=PET_OWNER&page=1&limit=20
-Success Response (200 OK):
-{
-  "success": true,
-  "data": {
-	"users": [
-  	{
-        "id": "usr_12345",
-        "email": "user@university.edu",
-        "fullName": "Maria Santos",
-        "role": "PET_OWNER",
-        "createdAt": "2026-02-28T14:30:00Z"
-  	}
-	],
-    "pagination": {
-      "page": 1,
-      "limit": 20,
-      "total": 1,
-      "pages": 1
-	}
-  },
-  "timestamp": "2026-02-28T14:30:00Z"
-}
+Admin
+- GET /api/admin/sitters/pending
+- POST /api/admin/sitters/{sitterId}/approve
+- POST /api/admin/sitters/{sitterId}/reject
 
 5.3 Error Handling
-HTTP Status Codes
-200 OK: Success - Standard successful request
-201 Created: Resource created - After POST that creates resource
-400 Bad Request: Invalid input - Validation errors, malformed JSON
-401 Unauthorized: Authentication failed - Missing or invalid JWT token
-403 Forbidden: Insufficient permissions - Role mismatch (e.g., user accessing admin endpoint)
-404 Not Found: Resource not found - Invalid ID or resource doesn't exist
-409 Conflict: Duplicate resource - Email already registered
-422 Unprocessable Entity: Business rule violation - Booking slot already taken
-429 Too Many Requests: Rate limit exceeded - More than 100 requests per minute
-500 Internal Server Error: Server error - Unexpected backend failure
+HTTP Status Codes (standard usage)
+- 200 OK: success
+- 201 Created: resource created
+- 400 Bad Request: validation errors or malformed input
+- 401 Unauthorized: missing/invalid JWT
+- 403 Forbidden: insufficient role/permissions
+- 404 Not Found: resource not found
+- 409 Conflict: duplicate resource
+- 422 Unprocessable Entity: business rule violation (e.g., slot already booked)
+- 429 Too Many Requests: rate limiting
+- 500 Internal Server Error: unexpected failures
 
-Common Error Codes
-AUTH-001: Invalid credentials
-HTTP Status: 401
-Description: Wrong email or password on login
-AUTH-002: Token expired
-HTTP Status: 401
-Description: JWT token past expiration time
-AUTH-003: Insufficient permissions
- HTTP Status: 403
-Description: Pet owner trying to access admin endpoint
-VALID-001: Validation failed
-HTTP Status: 400
-Description: Password less than 8 characters
-VALID-002: Required field missing
-HTTP Status: 400
-Description: Email not provided on registration
-DB-001: Resource not found
-HTTP Status: 404
-Description: Invalid user ID
-DB-002: Duplicate entry
-HTTP Status: 409
-Description: Email already registered
-BUSINESS-001: Slot unavailable
-HTTP Status: 422
-Description: Sitter is already booked for selected time
-BUSINESS-002: Profile incomplete
-HTTP Status: 422
-Description: Sitter profile missing before booking
-PAYMENT-001: Payment failed
-HTTP Status: 422
-Description: Card declined
-SYSTEM-001: Internal server error
-HTTP Status: 500
-Description: Database connection failure
-
-Example Error Response:
+Error object
+All error responses use the `error` field in the standard envelope and include an application error code. Example:
 {
   "success": false,
   "data": null,
-  "error": {
-	"code": "BUSINESS-001",
-    "message": "Time slot unavailable",
-    "details": "Sitter usr_54321 is already booked for 2026-03-01 09:00-10:00"
-  },
+  "error": { "code": "BUSINESS-001", "message": "Time slot unavailable", "details": "Sitter usr_54321 is already booked for 2026-03-01 09:00-10:00" },
   "timestamp": "2026-02-28T14:30:00Z"
 }
 
+Common application error codes used in the codebase include `AUTH-001`, `VALID-001`, `DB-001`, `BUSINESS-001`, `PAYMENT-001`, and `SYSTEM-001`.
+
 5.4 API Security Practices
-JWT Token Structure:
-Access tokens: 2-hour expiration
-Refresh tokens: 7-day expiration (stored securely in HTTP-only cookies)
-Password Policy:
-Minimum 8 characters
-At least 1 uppercase letter
-At least 1 number
-At least 1 special character
-Input Validation:
-All endpoints validate input types, lengths, and formats server-side
-SQL Injection Prevention:
-Parameterized queries via Spring Data JPA
-XSS Protection:
-Output encoding for all user-generated content
-CORS Policy:
-Restrict origins to approved web and mobile domains only
-Sensitive Data:
-Never return password hashes, full payment details, or unmasked tokens in responses
+- JWT: short-lived access token (2 hours) and refresh tokens (longer). Backend validates tokens on protected endpoints.
+- Passwords: bcrypt hashing (no plaintext storage).
+- Input validation: server-side validation on all POST/PUT endpoints.
+- SQL injection: prevented via JPA parameterization.
+- CORS: configured to allow the frontend origins defined via environment variables; webhook endpoints are explicitly permitted for PayMongo.
+- Secrets: PayMongo secret key and Supabase service role key are stored in environment variables in production (`PAYMONGO_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, etc.).
 
 
 6.0 DATABASE DESIGN

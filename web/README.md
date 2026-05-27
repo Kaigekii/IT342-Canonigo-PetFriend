@@ -24,9 +24,31 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
+## Vercel Deployment
+
+This app is ready for Vercel as a standard Next.js deployment.
+
+### Required environment variables
+
+Set these in Vercel Project Settings > Environment Variables:
+
+- `NEXT_PUBLIC_API_BASE_URL` - public URL of the deployed backend API
+- `NEXT_PUBLIC_SUPABASE_URL` - your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - your Supabase anon/public key
+
+Use the same values in a local `.env.local` file when running locally.
+
+### Supabase OAuth redirect URIs
+
+Add both of these to Supabase Auth settings:
+
+- `http://localhost:3000/auth/callback`
+- `https://<your-vercel-domain>/auth/callback`
+
+### Backend notes
+
+The frontend calls the backend directly, so the backend must be publicly reachable from Vercel. If the backend is still local, the deployed site will not be able to log in or create bookings.
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
 ## Deploy on Vercel
