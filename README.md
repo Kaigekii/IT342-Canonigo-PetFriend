@@ -392,7 +392,6 @@ This project contains local development configuration. Before deploying or makin
 
 ## Additional Documentation
 
-- Presentation script: `FINAL_PROJECT_PRESENTATION_SCRIPT.md`
 - Architecture notes: `ARCHITECTURE_DIAGRAMS.md`
 - Backend deployment notes: `backend/DEPLOYMENT.md`
 - Web notes: `web/README.md`
