@@ -161,8 +161,12 @@ class LoginActivity : Activity() {
 
     private fun startGoogleSignIn() {
         clearError()
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
+        btnGoogleLogin.isEnabled = false
+        googleSignInClient.signOut().addOnCompleteListener {
+            btnGoogleLogin.isEnabled = true
+            val signInIntent = googleSignInClient.signInIntent
+            startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

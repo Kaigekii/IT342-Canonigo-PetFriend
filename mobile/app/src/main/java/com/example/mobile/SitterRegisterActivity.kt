@@ -171,8 +171,12 @@ class SitterRegisterActivity : Activity() {
 
     private fun startGoogleSignIn() {
         clearError()
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
+        btnGoogleRegister.isEnabled = false
+        googleSignInClient.signOut().addOnCompleteListener {
+            btnGoogleRegister.isEnabled = true
+            val signInIntent = googleSignInClient.signInIntent
+            startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
